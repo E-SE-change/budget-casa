@@ -4,185 +4,377 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#09090d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <title>Budget Casa</title>
 
 <style>
+:root{
+  --bg:#09090d;
+  --card:#14141c;
+  --card2:#1b1b25;
+  --text:#f4f4f7;
+  --muted:#a7a7b4;
+  --border:#2c2c38;
+  --accent:#c084fc;
+  --accent2:#8b5cf6;
+  --green:#4ade80;
+  --red:#fb7185;
+  --yellow:#facc15;
+  --blue:#60a5fa;
+}
+
 *{
   box-sizing:border-box;
 }
 
 body{
   margin:0;
+  background:linear-gradient(180deg,#09090d 0%,#101019 100%);
+  color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
-  background:#09090d;
-  color:#f5f5f5;
+  min-height:100vh;
 }
 
 .container{
   width:min(1100px,94%);
-  margin:auto;
+  margin:0 auto;
   padding:20px 0 50px;
 }
 
-h1{
-  margin:0 0 5px;
+header{
+  text-align:center;
+  padding:15px 0 25px;
+}
+
+header h1{
+  margin:0;
   font-size:30px;
 }
 
-h2{
-  margin-top:0;
+header p{
+  margin:8px 0 0;
+  color:var(--muted);
 }
 
-.subtitle{
-  color:#aaa;
-  margin-bottom:25px;
+.month-bar{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:20px;
 }
 
-.card{
-  background:#15151d;
-  border:1px solid #292936;
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:18px;
+.month-bar button{
+  width:auto;
+  min-width:46px;
+  padding:10px 14px;
+}
+
+.month-title{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:11px 20px;
+  font-weight:bold;
+  min-width:190px;
+  text-align:center;
 }
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:14px;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+}
+
+.card{
+  background:rgba(20,20,28,.96);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 8px 30px rgba(0,0,0,.15);
+}
+
+.card.full{
+  grid-column:1/-1;
+}
+
+.card h2{
+  margin:0 0 15px;
+  font-size:18px;
+}
+
+.card h3{
+  margin:20px 0 10px;
+  font-size:15px;
+  color:#ddd;
 }
 
 label{
   display:block;
   font-size:13px;
-  color:#bbb;
+  color:var(--muted);
   margin-bottom:6px;
 }
 
-input,select,button{
+input,select{
   width:100%;
-  padding:11px 12px;
+  background:#0f0f16;
+  color:var(--text);
+  border:1px solid var(--border);
   border-radius:10px;
-  border:1px solid #373744;
-  background:#0f0f15;
-  color:white;
+  padding:11px 12px;
   font-size:15px;
+  outline:none;
+}
+
+input:focus,select:focus{
+  border-color:var(--accent);
+}
+
+.field{
+  margin-bottom:13px;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.row3{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
 }
 
 button{
+  border:0;
+  border-radius:11px;
+  padding:11px 15px;
+  background:var(--accent2);
+  color:white;
   cursor:pointer;
-  background:#242432;
-  border-color:#444456;
+  font-weight:bold;
+  font-size:14px;
 }
 
 button:hover{
-  background:#303040;
+  filter:brightness(1.1);
 }
 
-.primary{
-  background:#7c3aed;
-  border-color:#7c3aed;
+button.secondary{
+  background:#292936;
 }
 
-.danger{
-  background:#35191d;
-  border-color:#6d2932;
+button.danger{
+  background:#7f1d1d;
 }
 
-.small{
-  font-size:12px;
-  color:#999;
+button.green{
+  background:#166534;
 }
 
-.big{
-  font-size:28px;
-  font-weight:bold;
-}
-
-.positive{
-  color:#65d391;
-}
-
-.negative{
-  color:#ff7777;
-}
-
-.month-header{
+.actions{
   display:flex;
-  justify-content:space-between;
-  align-items:center;
   gap:10px;
   flex-wrap:wrap;
-}
-
-.expense-row{
-  display:grid;
-  grid-template-columns:1fr 150px;
-  gap:12px;
-  align-items:end;
-  padding:13px 0;
-  border-bottom:1px solid #272731;
-}
-
-.expense-row:last-child{
-  border-bottom:0;
-}
-
-.debt-box{
-  margin-top:10px;
-  padding:14px;
-  border-radius:12px;
-  background:#101017;
-  border:1px solid #2b2b38;
-}
-
-.debt-progress{
-  height:9px;
-  background:#292934;
-  border-radius:20px;
-  overflow:hidden;
-  margin:10px 0;
-}
-
-.debt-progress-bar{
-  height:100%;
-  background:#7c3aed;
-}
-
-.utility-box{
-  padding:15px;
-  border:1px solid #30303b;
-  border-radius:14px;
   margin-top:12px;
 }
 
-.summary{
+.expense-item{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  grid-template-columns:1fr 130px;
+  gap:10px;
+  align-items:end;
+  padding:11px 0;
+  border-bottom:1px solid #24242e;
+}
+
+.expense-item:last-child{
+  border-bottom:0;
+}
+
+.expense-name{
+  font-weight:bold;
+  font-size:14px;
+}
+
+.small{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:4px;
+}
+
+.debt-box{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.debt-header{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.debt-header strong{
+  font-size:15px;
+}
+
+.status{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.progress{
+  height:8px;
+  background:#292936;
+  border-radius:99px;
+  overflow:hidden;
+  margin-top:10px;
+}
+
+.progress div{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  width:0%;
+}
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
 }
 
-.summary-item{
-  background:#101017;
-  border:1px solid #292936;
+.summary-box{
+  background:var(--card2);
+  border:1px solid var(--border);
   border-radius:14px;
   padding:15px;
 }
 
-hr{
-  border:0;
-  border-top:1px solid #292936;
-  margin:18px 0;
+.summary-box .label{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:7px;
 }
 
-@media(max-width:600px){
-  .expense-row{
+.summary-box .value{
+  font-size:21px;
+  font-weight:bold;
+}
+
+.green-text{
+  color:var(--green);
+}
+
+.red-text{
+  color:var(--red);
+}
+
+.yellow-text{
+  color:var(--yellow);
+}
+
+.blue-text{
+  color:var(--blue);
+}
+
+.utility-box{
+  border:1px solid #3b3150;
+  background:linear-gradient(135deg,#181421,#21182c);
+  border-radius:15px;
+  padding:16px;
+}
+
+.utility-balance{
+  font-size:28px;
+  font-weight:bold;
+  margin:6px 0;
+}
+
+.info{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.notice{
+  padding:12px;
+  border-radius:12px;
+  background:#171721;
+  border:1px solid var(--border);
+  color:#d7d7df;
+  font-size:13px;
+  line-height:1.5;
+  margin-top:10px;
+}
+
+.goal-bar{
+  height:10px;
+  background:#292936;
+  border-radius:99px;
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.goal-bar div{
+  height:100%;
+  background:linear-gradient(90deg,#60a5fa,#c084fc);
+  width:0%;
+}
+
+footer{
+  text-align:center;
+  margin-top:25px;
+  color:#777784;
+  font-size:12px;
+}
+
+@media(max-width:760px){
+  .grid{
     grid-template-columns:1fr;
   }
 
-  h1{
-    font-size:25px;
+  .card.full{
+    grid-column:auto;
+  }
+
+  .summary-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .row3{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:480px){
+  .container{
+    width:92%;
+  }
+
+  header h1{
+    font-size:26px;
+  }
+
+  .summary-grid{
+    grid-template-columns:1fr;
+  }
+
+  .expense-item{
+    grid-template-columns:1fr;
+  }
+
+  .month-title{
+    min-width:160px;
   }
 }
 </style>
@@ -192,1998 +384,1278 @@ hr{
 
 <div class="container">
 
+<header>
   <h1>🏠 Budget Casa</h1>
-  <div class="subtitle">
-    Bilancio familiare, spese, debiti e accantonamento
-  </div>
+  <p>Gestione semplice di entrate, spese, debiti e accantonamenti</p>
+</header>
 
-  <!-- MESE -->
-  <div class="card">
-    <div class="month-header">
-      <div>
-        <h2>Mese</h2>
-        <div class="small">
-          Tutti i calcoli vengono effettuati sul mese selezionato.
-        </div>
-      </div>
+<div class="month-bar">
+  <button class="secondary" onclick="changeMonth(-1)">‹</button>
+  <div class="month-title" id="monthTitle"></div>
+  <button class="secondary" onclick="changeMonth(1)">›</button>
+</div>
 
-      <div style="min-width:180px">
-        <input type="month" id="monthPicker">
-      </div>
+<div class="grid">
+
+<!-- ENTRATE -->
+<section class="card">
+  <h2>💰 Entrate del mese</h2>
+
+  <div class="row">
+    <div class="field">
+      <label>Stipendio tuo</label>
+      <input type="number" id="salaryUser" min="0" step="0.01"
+             oninput="saveAndRender()">
+    </div>
+
+    <div class="field">
+      <label>Stipendio Andrea</label>
+      <input type="number" id="salaryPartner" min="0" step="0.01"
+             oninput="saveAndRender()">
     </div>
   </div>
 
-  <!-- STIPENDI -->
-  <div class="card">
-    <h2>💰 Entrate</h2>
-
-    <div class="grid">
-
-      <div>
-        <label>Stipendio 1</label>
-        <input
-          type="number"
-          step="0.01"
-          id="salary1"
-          placeholder="0,00"
-        >
-      </div>
-
-      <div>
-        <label>Stipendio 2</label>
-        <input
-          type="number"
-          step="0.01"
-          id="salary2"
-          placeholder="0,00"
-        >
-      </div>
-
+  <div class="row">
+    <div class="field">
+      <label>Contributo tuo alla casa</label>
+      <input type="number" id="contributionUser" min="0" step="0.01"
+             oninput="saveAndRender()">
     </div>
 
-    <hr>
-
-    <div class="grid">
-
-      <div>
-        <label>Contributo casa persona 1</label>
-        <input
-          type="number"
-          step="0.01"
-          id="contribution1"
-          value="600"
-        >
-      </div>
-
-      <div>
-        <label>Contributo casa persona 2</label>
-        <input
-          type="number"
-          step="0.01"
-          id="contribution2"
-          value="600"
-        >
-      </div>
-
-    </div>
-
-    <p class="small">
-      Gli stipendi sono mostrati separatamente. Il bilancio della casa
-      utilizza invece i contributi destinati alle spese.
-    </p>
-  </div>
-
-
-  <!-- RIEPILOGO -->
-  <div class="card">
-    <h2>📊 Riepilogo del mese</h2>
-
-    <div class="summary">
-
-      <div class="summary-item">
-        <div class="small">Stipendi totali</div>
-        <div class="big" id="summarySalary">€0,00</div>
-      </div>
-
-      <div class="summary-item">
-        <div class="small">Fondo casa</div>
-        <div class="big" id="summaryFund">€1.200,00</div>
-      </div>
-
-      <div class="summary-item">
-        <div class="small">Spese effettive</div>
-        <div class="big" id="summaryExpenses">€0,00</div>
-      </div>
-
-      <div class="summary-item">
-        <div class="small">Risultato mese</div>
-        <div class="big" id="summaryBalance">€0,00</div>
-      </div>
-
-      <div class="summary-item">
-        <div class="small">Accantonamento cumulativo</div>
-        <div class="big" id="summaryCumulative">€0,00</div>
-      </div>
-
+    <div class="field">
+      <label>Contributo Andrea alla casa</label>
+      <input type="number" id="contributionPartner" min="0" step="0.01"
+             oninput="saveAndRender()">
     </div>
   </div>
 
-
-  <!-- SPESE -->
-  <div class="card">
-
-    <h2>🧾 Spese</h2>
-
-    <div class="small" style="margin-bottom:15px">
-      L'affitto viene pagato nel mese successivo a quello di riferimento.
-      L'arretrato affitto invece viene gestito come un debito a rate.
-    </div>
-
-    <div id="expensesContainer"></div>
-
-    <hr>
-
-    <button onclick="copyPreviousMonth()">
-      📋 Copia le spese dal mese precedente
-    </button>
-
+  <div class="field">
+    <label>Interessi Trade Republic accreditati questo mese</label>
+    <input type="number" id="interest" min="0" step="0.01"
+           oninput="saveAndRender()">
   </div>
 
+  <div class="notice">
+    Gli stipendi vengono mostrati separatamente.
+    Il budget della casa viene calcolato invece sui contributi destinati alla casa.
+  </div>
+</section>
 
-  <!-- FINANZIAMENTO PROPRIETARIO -->
-  <div class="card">
 
-    <h2>🏦 Finanziamento proprietario</h2>
+<!-- SALVADANAIO UTENZE -->
+<section class="card">
+  <h2>💡 Salvadanaio Luce + Gas</h2>
 
-    <div class="grid">
-
-      <div>
-        <label>Debito totale</label>
-        <input
-          type="number"
-          step="0.01"
-          id="ownerDebt"
-          placeholder="es. 2376"
-        >
-      </div>
-
-      <div>
-        <label>Rata mensile</label>
-        <input
-          type="number"
-          step="0.01"
-          id="ownerInstallment"
-          placeholder="es. 100"
-        >
-      </div>
-
-      <div>
-        <label>Prima rata</label>
-        <input type="month" id="ownerStart">
-      </div>
-
+  <div class="row">
+    <div class="field">
+      <label>Accantonamento Luce mensile</label>
+      <input type="number" id="lightProvision" min="0" step="0.01"
+             oninput="saveAndRender()">
     </div>
 
-    <div id="ownerDebtInfo" class="debt-box"></div>
-
+    <div class="field">
+      <label>Accantonamento Gas mensile</label>
+      <input type="number" id="gasProvision" min="0" step="0.01"
+             oninput="saveAndRender()">
+    </div>
   </div>
 
-
-  <!-- ARRETRATO AFFITTO -->
-  <div class="card">
-
-    <h2>📋 Arretrato affitto</h2>
-
-    <div class="small" style="margin-bottom:15px">
-      L'arretrato viene trattato come un debito a rate.
-      Inserisci il totale dovuto, la rata mensile e il mese della prima rata.
-      L'app calcolerà automaticamente il residuo mese per mese.
+  <div class="row">
+    <div class="field">
+      <label>Luce effettivamente pagata questo mese</label>
+      <input type="number" id="lightPaid" min="0" step="0.01"
+             oninput="saveAndRender()">
     </div>
 
-    <div class="grid">
-
-      <div>
-        <label>Debito totale arretrato</label>
-        <input
-          type="number"
-          step="0.01"
-          id="rentDebt"
-          placeholder="es. 3129"
-        >
-      </div>
-
-      <div>
-        <label>Rata mensile</label>
-        <input
-          type="number"
-          step="0.01"
-          id="rentInstallment"
-          placeholder="es. 50"
-        >
-      </div>
-
-      <div>
-        <label>Prima rata</label>
-        <input type="month" id="rentStart">
-      </div>
-
+    <div class="field">
+      <label>Gas effettivamente pagato questo mese</label>
+      <input type="number" id="gasPaid" min="0" step="0.01"
+             oninput="saveAndRender()">
     </div>
-
-    <div id="rentDebtInfo" class="debt-box"></div>
-
   </div>
 
+  <div class="utility-box">
+    <div class="info">Salvadanaio Luce + Gas accumulato</div>
+    <div class="utility-balance" id="utilityBalance">€ 0,00</div>
+    <div class="info" id="utilityMessage"></div>
+  </div>
 
-  <!-- LUCE -->
-  <div class="card">
+  <div class="notice">
+    Ogni mese vengono accantonati automaticamente Luce + Gas.
+    Inserisci solo quanto hai realmente pagato quel mese.
+    Non importa a quali mesi si riferisce la bolletta.
+  </div>
+</section>
 
-    <h2>💡 Luce</h2>
 
-    <div class="utility-box">
+<!-- SPESE ORDINARIE -->
+<section class="card">
+  <h2>🧾 Spese della casa</h2>
 
-      <div class="grid">
+  <div class="field">
+    <label>Affitto mese precedente — pagato questo mese</label>
+    <input type="number" id="rentPrevious" min="0" step="0.01"
+           oninput="saveAndRender()">
+  </div>
 
-        <div>
-          <label>Previsione mensile luce</label>
-          <input
-            type="number"
-            step="0.01"
-            id="lightForecast"
-            value="90"
-          >
-        </div>
+  <div id="ordinaryExpenses"></div>
 
-        <div>
-          <label>Frequenza bolletta</label>
-          <input value="Ogni 2 mesi" disabled>
-        </div>
+  <div class="actions">
+    <button onclick="copyPreviousMonth()">Copia spese dal mese precedente</button>
+  </div>
+</section>
 
-        <div>
-          <label>Importo bolletta reale</label>
-          <input
-            type="number"
-            step="0.01"
-            id="lightBill"
-            placeholder="Inserisci solo quando arriva"
-          >
-        </div>
 
-        <div>
-          <label>Mese della bolletta</label>
-          <input type="month" id="lightBillMonth">
-        </div>
+<!-- DEBITI -->
+<section class="card full">
+  <h2>📌 Debiti a rate</h2>
 
-      </div>
+  <div class="notice">
+    Imposta una sola volta debito totale, rata mensile e prima rata.
+    L'app calcolerà automaticamente le rate nei mesi successivi,
+    compresa l'eventuale ultima rata più bassa.
+  </div>
 
-      <div class="small" style="margin-top:10px">
-        Previsione di 2 mesi = previsione mensile × 2.
-        La differenza rispetto alla bolletta reale viene aggiunta o sottratta
-        all'accantonamento.
-      </div>
+  <div id="debts"></div>
+</section>
 
-      <div id="lightInfo" class="debt-box"></div>
 
+<!-- OBIETTIVO -->
+<section class="card">
+  <h2>🎯 Obiettivo di accantonamento</h2>
+
+  <div class="field">
+    <label>Obiettivo</label>
+    <input type="number" id="goal" min="0" step="0.01"
+           oninput="saveAndRender()">
+  </div>
+
+  <div class="small" id="goalText">Nessun obiettivo impostato.</div>
+
+  <div class="goal-bar">
+    <div id="goalProgress"></div>
+  </div>
+</section>
+
+
+<!-- RIEPILOGO -->
+<section class="card full">
+  <h2>📊 Riepilogo del mese</h2>
+
+  <div class="summary-grid">
+
+    <div class="summary-box">
+      <div class="label">Stipendi totali</div>
+      <div class="value" id="totalSalaries">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Fondo casa</div>
+      <div class="value" id="houseFund">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Spese non utenze</div>
+      <div class="value" id="nonUtilityExpenses">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Accantonamento Luce + Gas del mese</div>
+      <div class="value blue-text" id="utilityProvisionTotal">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Bollette effettivamente pagate</div>
+      <div class="value" id="utilityPaidTotal">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Risultato generale del mese</div>
+      <div class="value" id="monthlyGeneralResult">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Accantonamento generale cumulato</div>
+      <div class="value green-text" id="generalCumulative">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Salvadanaio Luce + Gas</div>
+      <div class="value blue-text" id="utilityCumulative">€ 0,00</div>
+    </div>
+
+    <div class="summary-box">
+      <div class="label">Totale accantonato</div>
+      <div class="value yellow-text" id="totalSaved">€ 0,00</div>
     </div>
 
   </div>
 
+  <div class="notice" id="generalMessage"></div>
+</section>
 
-  <!-- GAS -->
-  <div class="card">
 
-    <h2>🔥 Gas</h2>
+<section class="card full">
+  <h2>⚙️ Gestione dati</h2>
 
-    <div class="utility-box">
-
-      <div class="grid">
-
-        <div>
-          <label>Previsione mensile gas</label>
-          <input
-            type="number"
-            step="0.01"
-            id="gasForecast"
-            value="75"
-          >
-        </div>
-
-        <div>
-          <label>Frequenza bolletta</label>
-          <input value="Ogni 2 mesi" disabled>
-        </div>
-
-        <div>
-          <label>Importo bolletta reale</label>
-          <input
-            type="number"
-            step="0.01"
-            id="gasBill"
-            placeholder="Inserisci solo quando arriva"
-          >
-        </div>
-
-        <div>
-          <label>Mese della bolletta</label>
-          <input type="month" id="gasBillMonth">
-        </div>
-
-      </div>
-
-      <div class="small" style="margin-top:10px">
-        Previsione di 2 mesi = previsione mensile × 2.
-        La differenza rispetto alla bolletta reale viene aggiunta o sottratta
-        all'accantonamento.
-      </div>
-
-      <div id="gasInfo" class="debt-box"></div>
-
-    </div>
-
+  <div class="actions">
+    <button class="secondary" onclick="goToStart()">Vai a ottobre 2026</button>
+    <button class="danger" onclick="resetData()">Cancella tutti i dati</button>
   </div>
 
-
-  <!-- INTERESSI -->
-  <div class="card">
-
-    <h2>🏦 Interessi banca</h2>
-
-    <div class="grid">
-
-      <div>
-        <label>Interessi effettivamente accreditati nel mese</label>
-        <input
-          type="number"
-          step="0.01"
-          id="bankInterest"
-          placeholder="0,00"
-        >
-      </div>
-
-    </div>
-
-    <p class="small">
-      Inserisci semplicemente l'importo realmente accreditato dalla banca.
-      Verrà aggiunto automaticamente all'accantonamento.
-    </p>
-
+  <div class="notice">
+    I dati vengono salvati esclusivamente nel browser del dispositivo.
+    Non vengono inviati a GitHub né a un server.
   </div>
+</section>
 
+</div>
 
-  <!-- OBIETTIVO -->
-  <div class="card">
-
-    <h2>🎯 Obiettivo di risparmio</h2>
-
-    <div class="grid">
-
-      <div>
-        <label>Obiettivo</label>
-        <input
-          type="number"
-          step="0.01"
-          id="savingGoal"
-          placeholder="es. 10000"
-        >
-      </div>
-
-    </div>
-
-    <div id="goalInfo" class="debt-box"></div>
-
-  </div>
-
-
-  <!-- DATI -->
-  <div class="card">
-
-    <h2>💾 Dati</h2>
-
-    <p class="small">
-      Tutti i dati vengono salvati localmente nel browser del dispositivo.
-      Non vengono inviati a GitHub o a un server.
-    </p>
-
-    <button class="danger" onclick="resetAll()">
-      Cancella tutti i dati
-    </button>
-
-  </div>
+<footer>
+  Budget Casa · Dati salvati localmente sul dispositivo
+</footer>
 
 </div>
 
 
 <script>
 
-const STORAGE_KEY = "budgetCasaV6";
+const STORAGE_KEY = "budgetCasaV7";
 
-const expenseDefinitions = [
+const START_YEAR = 2026;
+const START_MONTH = 9; // ottobre = 9
 
-  {
-    id:"rent",
-    name:"Affitto mese precedente",
-    ordinary:true,
-    defaultAmount:500
-  },
+let currentDate = new Date(START_YEAR, START_MONTH, 1);
 
-  {
-    id:"owner",
-    name:"Finanziamento proprietario",
-    debt:true
-  },
-
-  {
-    id:"rentDebt",
-    name:"Rata arretrato affitto",
-    debt:true
-  },
-
-  {
-    id:"heating",
-    name:"Riscaldamento",
-    debt:true
-  },
-
-  {
-    id:"internet",
-    name:"Internet",
-    ordinary:true,
-    defaultAmount:28
-  },
-
-  {
-    id:"light",
-    name:"Luce",
-    utility:true
-  },
-
-  {
-    id:"gas",
-    name:"Gas",
-    utility:true
-  },
-
-  {
-    id:"soris",
-    name:"Soris",
-    ordinary:true,
-    defaultAmount:0
-  },
-
-  {
-    id:"carInsurance",
-    name:"Assicurazione macchina",
-    ordinary:true,
-    defaultAmount:118
-  },
-
-  {
-    id:"netflix",
-    name:"Netflix",
-    ordinary:true,
-    defaultAmount:6.99
-  },
-
-  {
-    id:"amazon",
-    name:"Amazon",
-    ordinary:true,
-    defaultAmount:5.99
-  },
-
-  {
-    id:"oldBill",
-    name:"Bolletta vecchia",
-    ordinary:true,
-    defaultAmount:0
-  }
-
+const ordinaryDefinitions = [
+  {key:"internet", name:"Internet", default:28},
+  {key:"netflix", name:"Netflix", default:6.99},
+  {key:"amazon", name:"Amazon Prime", default:5.99},
+  {key:"carInsurance", name:"Assicurazione macchina", default:118},
+  {key:"soris", name:"Soris", default:0},
+  {key:"oldElectricity", name:"Bolletta vecchia", default:0}
 ];
 
+const debtDefinitions = [
+  {
+    key:"owner",
+    name:"Finanziamento proprietario"
+  },
+  {
+    key:"rentArrears",
+    name:"Arretrato affitto"
+  },
+  {
+    key:"heating",
+    name:"Riscaldamento"
+  }
+];
 
-let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+function createInitialData(){
 
-let currentKey = "";
+  return {
+    settings:{
+      lightProvision:90,
+      gasProvision:75,
+      goal:0,
 
+      debts:{
+        owner:{
+          total:0,
+          installment:0,
+          start:"2026-10"
+        },
 
-function save(){
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+        rentArrears:{
+          total:0,
+          installment:0,
+          start:"2026-10"
+        },
+
+        heating:{
+          total:0,
+          installment:0,
+          start:"2026-10"
+        }
+      }
+    },
+
+    months:{}
+  };
 }
 
 
-function money(value){
-  return new Intl.NumberFormat("it-IT",{
+function loadData(){
+
+  try{
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if(!saved){
+      return createInitialData();
+    }
+
+    const parsed = JSON.parse(saved);
+
+    if(!parsed.settings) parsed.settings = {};
+    if(!parsed.settings.debts) parsed.settings.debts = {};
+
+    if(parsed.settings.lightProvision === undefined)
+      parsed.settings.lightProvision = 90;
+
+    if(parsed.settings.gasProvision === undefined)
+      parsed.settings.gasProvision = 75;
+
+    if(parsed.settings.goal === undefined)
+      parsed.settings.goal = 0;
+
+    for(const d of debtDefinitions){
+
+      if(!parsed.settings.debts[d.key]){
+        parsed.settings.debts[d.key] = {
+          total:0,
+          installment:0,
+          start:"2026-10"
+        };
+      }
+    }
+
+    if(!parsed.months) parsed.months = {};
+
+    return parsed;
+
+  }catch(e){
+
+    console.error(e);
+
+    return createInitialData();
+  }
+}
+
+
+let data = loadData();
+
+
+function saveData(){
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+
+function monthKey(date=currentDate){
+
+  return date.getFullYear() + "-" +
+    String(date.getMonth()+1).padStart(2,"0");
+}
+
+
+function parseMonthKey(key){
+
+  const [y,m] = key.split("-").map(Number);
+
+  return new Date(y,m-1,1);
+}
+
+
+function getMonthData(key){
+
+  if(!data.months[key]){
+
+    data.months[key] = {
+
+      salaryUser:0,
+      salaryPartner:0,
+
+      contributionUser:600,
+      contributionPartner:600,
+
+      interest:0,
+
+      rentPrevious:0,
+
+      lightPaid:0,
+      gasPaid:0,
+
+      expenses:{}
+    };
+
+    for(const e of ordinaryDefinitions){
+      data.months[key].expenses[e.key] = e.default;
+    }
+  }
+
+  return data.months[key];
+}
+
+
+function euro(value){
+
+  return Number(value || 0).toLocaleString("it-IT",{
     style:"currency",
     currency:"EUR"
-  }).format(Number(value)||0);
+  });
 }
 
 
-function currentMonthKey(){
+function numberValue(id){
 
-  const d = new Date();
+  const el = document.getElementById(id);
 
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+  if(!el) return 0;
 
+  return Number(el.value) || 0;
 }
 
 
-function previousKey(key){
+function formatMonth(date){
 
-  const [y,m] = key.split("-").map(Number);
-
-  const d = new Date(y,m-2,1);
-
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
-
-}
-
-
-function nextKey(key){
-
-  const [y,m] = key.split("-").map(Number);
-
-  const d = new Date(y,m,1);
-
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
-
-}
-
-
-function monthsDifference(start,end){
-
-  const [sy,sm] = start.split("-").map(Number);
-  const [ey,em] = end.split("-").map(Number);
-
-  return (ey-sy)*12+(em-sm);
-
-}
-
-
-function getMonth(key){
-
-  if(!data[key]){
-    data[key]={
-      salary1:0,
-      salary2:0,
-      contribution1:600,
-      contribution2:600,
-      expenses:{},
-      bankInterest:0,
-      lightForecast:90,
-      gasForecast:75,
-      lightBill:"",
-      lightBillMonth:"",
-      gasBill:"",
-      gasBillMonth:"",
-      savingGoal:0
-    };
-  }
-
-  return data[key];
-
-}
-
-
-function debtPayment(total,installment,start,key){
-
-  total=Number(total)||0;
-  installment=Number(installment)||0;
-
-  if(!total || !installment || !start || key<start){
-    return 0;
-  }
-
-  const diff=monthsDifference(start,key);
-
-  const paidBefore=diff*installment;
-
-  const remainingBefore=Math.max(0,total-paidBefore);
-
-  return Math.min(installment,remainingBefore);
-
-}
-
-
-function debtRemaining(total,installment,start,key){
-
-  total=Number(total)||0;
-  installment=Number(installment)||0;
-
-  if(!total) return 0;
-
-  if(!installment || !start){
-    return total;
-  }
-
-  const payment=debtPayment(total,installment,start,key);
-
-  const diff=monthsDifference(start,key);
-
-  const paidBefore=Math.max(0,diff)*installment;
-
-  return Math.max(0,total-paidBefore-payment);
-
-}
-
-
-function debtPaid(total,installment,start,key){
-
-  total=Number(total)||0;
-
-  return Math.max(0,total-debtRemaining(total,installment,start,key));
-
-}
-
-
-function debtLastMonth(total,installment,start){
-
-  total=Number(total)||0;
-  installment=Number(installment)||0;
-
-  if(!total || !installment || !start){
-    return "";
-  }
-
-  const numberOfPayments=Math.ceil(total/installment);
-
-  const [y,m]=start.split("-").map(Number);
-
-  const d=new Date(y,m-1+numberOfPayments-1,1);
-
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
-
-}
-
-
-function monthLabel(key){
-
-  if(!key) return "";
-
-  const [y,m]=key.split("-").map(Number);
-
-  return new Intl.DateTimeFormat("it-IT",{
+  return date.toLocaleDateString("it-IT",{
     month:"long",
     year:"numeric"
-  }).format(new Date(y,m-1,1));
-
+  }).replace(/^./,c=>c.toUpperCase());
 }
 
 
-/* -------------------------
-   AFFITTO
-------------------------- */
+function changeMonth(amount){
 
-function getRentPaymentForMonth(key){
-
-  const previous=previousKey(key);
-
-  const prev=data[previous];
-
-  if(!prev || !prev.expenses){
-    return 0;
-  }
-
-  return Number(prev.expenses.rent)||0;
-
-}
-
-
-/* -------------------------
-   SPESE ORDINARIE
-------------------------- */
-
-function ordinaryExpensesTotal(key){
-
-  const month=getMonth(key);
-
-  let total=0;
-
-  /*
-    Affitto:
-    viene pagato nel mese successivo.
-  */
-
-  total+=getRentPaymentForMonth(key);
-
-
-  /*
-    Tutte le altre spese ordinarie
-    vengono pagate nel mese corrente.
-  */
-
-  expenseDefinitions.forEach(item=>{
-
-    if(!item.ordinary || item.id==="rent"){
-      return;
-    }
-
-    total+=Number(month.expenses[item.id])||0;
-
-  });
-
-
-  return total;
-
-}
-
-
-/* -------------------------
-   DEBITI
-------------------------- */
-
-function ownerPayment(key){
-
-  const m=getMonth(key);
-
-  return debtPayment(
-    m.ownerDebt,
-    m.ownerInstallment,
-    m.ownerStart,
-    key
+  currentDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth()+amount,
+    1
   );
 
+  render();
 }
 
 
-function rentDebtPayment(key){
+function goToStart(){
 
-  const m=getMonth(key);
+  currentDate = new Date(START_YEAR,START_MONTH,1);
 
-  return debtPayment(
-    m.rentDebt,
-    m.rentInstallment,
-    m.rentStart,
-    key
-  );
-
+  render();
 }
 
-
-function heatingPayment(key){
-
-  const m=getMonth(key);
-
-  return debtPayment(
-    m.heatingDebt,
-    m.heatingInstallment,
-    m.heatingStart,
-    key
-  );
-
-}
-
-
-/* -------------------------
-   UTILITY
-------------------------- */
-
-function utilityForecastTotal(key){
-
-  const m=getMonth(key);
-
-  const light=(Number(m.lightForecast)||0)*1;
-  const gas=(Number(m.gasForecast)||0)*1;
-
-  return light+gas;
-
-}
-
-
-function utilityAdjustmentForMonth(key){
-
-  const m=getMonth(key);
-
-  let adjustment=0;
-
-  /*
-    Luce
-  */
-
-  if(
-    m.lightBill!=="" &&
-    m.lightBillMonth===key
-  ){
-
-    const forecast=(Number(m.lightForecast)||0)*2;
-    const real=Number(m.lightBill)||0;
-
-    adjustment+=forecast-real;
-
-  }
-
-
-  /*
-    Gas
-  */
-
-  if(
-    m.gasBill!=="" &&
-    m.gasBillMonth===key
-  ){
-
-    const forecast=(Number(m.gasForecast)||0)*2;
-    const real=Number(m.gasBill)||0;
-
-    adjustment+=forecast-real;
-
-  }
-
-
-  return adjustment;
-
-}
-
-
-/*
-  La previsione mensile di luce e gas
-  entra nelle spese del mese.
-
-  Quando arriva la bolletta:
-  previsione 2 mesi - bolletta reale
-  viene aggiunta all'accantonamento.
-
-  Esempio:
-  90 x 2 = 180
-  bolletta 150
-  differenza +30
-
-  Costo netto = 180 - 30 = 150
-*/
-
-
-function expensesTotal(key){
-
-  const m=getMonth(key);
-
-  let total=0;
-
-  total+=ordinaryExpensesTotal(key);
-
-  total+=ownerPayment(key);
-
-  total+=rentDebtPayment(key);
-
-  total+=heatingPayment(key);
-
-  /*
-    Previsione luce e gas mensile
-  */
-
-  total+=Number(m.lightForecast)||0;
-  total+=Number(m.gasForecast)||0;
-
-  return total;
-
-}
-
-
-/* -------------------------
-   INTERESSI
-------------------------- */
-
-function monthInterest(key){
-
-  const m=getMonth(key);
-
-  return Number(m.bankInterest)||0;
-
-}
-
-
-/* -------------------------
-   RISULTATO MESE
-------------------------- */
-
-function monthlyBalance(key){
-
-  const m=getMonth(key);
-
-  const fund=
-    (Number(m.contribution1)||0)+
-    (Number(m.contribution2)||0);
-
-  const expenses=expensesTotal(key);
-
-  const utilityAdjustment=utilityAdjustmentForMonth(key);
-
-  const interest=monthInterest(key);
-
-  return fund-expenses+utilityAdjustment+interest;
-
-}
-
-
-/* -------------------------
-   CUMULATIVO
-------------------------- */
-
-function sortedDataKeys(){
-
-  return Object.keys(data).sort();
-
-}
-
-
-function cumulativeUntil(key){
-
-  let total=0;
-
-  sortedDataKeys().forEach(k=>{
-
-    if(k<=key){
-      total+=monthlyBalance(k);
-    }
-
-  });
-
-  return total;
-
-}
-
-
-/* -------------------------
-   RENDER
-------------------------- */
 
 function render(){
 
-  const m=getMonth(currentKey);
+  const key = monthKey();
 
-  document.getElementById("salary1").value=m.salary1||"";
-  document.getElementById("salary2").value=m.salary2||"";
+  const month = getMonthData(key);
 
-  document.getElementById("contribution1").value=
-    m.contribution1 ?? 600;
+  document.getElementById("monthTitle").textContent =
+    formatMonth(currentDate);
 
-  document.getElementById("contribution2").value=
-    m.contribution2 ?? 600;
+  document.getElementById("salaryUser").value =
+    month.salaryUser || "";
 
-  document.getElementById("bankInterest").value=
-    m.bankInterest||"";
+  document.getElementById("salaryPartner").value =
+    month.salaryPartner || "";
 
-  document.getElementById("savingGoal").value=
-    m.savingGoal||"";
+  document.getElementById("contributionUser").value =
+    month.contributionUser;
 
-  /*
-    Debito proprietario
-  */
+  document.getElementById("contributionPartner").value =
+    month.contributionPartner;
 
-  document.getElementById("ownerDebt").value=
-    m.ownerDebt||"";
+  document.getElementById("interest").value =
+    month.interest || "";
 
-  document.getElementById("ownerInstallment").value=
-    m.ownerInstallment||"";
+  document.getElementById("rentPrevious").value =
+    month.rentPrevious || "";
 
-  document.getElementById("ownerStart").value=
-    m.ownerStart||"";
+  document.getElementById("lightProvision").value =
+    data.settings.lightProvision;
 
+  document.getElementById("gasProvision").value =
+    data.settings.gasProvision;
 
-  /*
-    Arretrato
-  */
+  document.getElementById("lightPaid").value =
+    month.lightPaid || "";
 
-  document.getElementById("rentDebt").value=
-    m.rentDebt||"";
+  document.getElementById("gasPaid").value =
+    month.gasPaid || "";
 
-  document.getElementById("rentInstallment").value=
-    m.rentInstallment||"";
+  document.getElementById("goal").value =
+    data.settings.goal || "";
 
-  document.getElementById("rentStart").value=
-    m.rentStart||"";
-
-
-  /*
-    Riscaldamento
-  */
-
-  if(m.heatingDebt!==undefined){
-
-    /*
-      Se presenti vengono mostrati nei dati.
-      Il blocco viene creato automaticamente
-      nella sezione spese.
-    */
-
-  }
-
-
-  /*
-    Utility
-  */
-
-  document.getElementById("lightForecast").value=
-    m.lightForecast ?? 90;
-
-  document.getElementById("gasForecast").value=
-    m.gasForecast ?? 75;
-
-  document.getElementById("lightBill").value=
-    m.lightBill ?? "";
-
-  document.getElementById("lightBillMonth").value=
-    m.lightBillMonth ?? "";
-
-  document.getElementById("gasBill").value=
-    m.gasBill ?? "";
-
-  document.getElementById("gasBillMonth").value=
-    m.gasBillMonth ?? "";
-
-
-  renderExpenses();
-  renderDebtInfo();
-  renderUtilityInfo();
+  renderOrdinaryExpenses();
+  renderDebts();
   renderSummary();
-  renderGoal();
-
 }
 
 
-/* -------------------------
-   SPESE UI
-------------------------- */
+function renderOrdinaryExpenses(){
 
-function renderExpenses(){
+  const key = monthKey();
+  const month = getMonthData(key);
 
-  const container=
-    document.getElementById("expensesContainer");
+  const container =
+    document.getElementById("ordinaryExpenses");
 
-  container.innerHTML="";
+  container.innerHTML = "";
 
-  const m=getMonth(currentKey);
+  for(const e of ordinaryDefinitions){
 
-  expenseDefinitions.forEach(item=>{
+    const value = month.expenses[e.key] ?? e.default;
 
-    /*
-      Le voci debt vengono mostrate
-      con il loro pagamento automatico.
-    */
+    const div = document.createElement("div");
 
-    if(item.id==="owner"){
-      return;
+    div.className = "expense-item";
+
+    div.innerHTML = `
+      <div>
+        <div class="expense-name">${e.name}</div>
+      </div>
+
+      <div>
+        <label>Importo</label>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value="${value || ""}"
+          oninput="setExpense('${e.key}',this.value)"
+        >
+      </div>
+    `;
+
+    container.appendChild(div);
+  }
+}
+
+
+function setExpense(key,value){
+
+  const month = getMonthData(monthKey());
+
+  month.expenses[key] = Number(value) || 0;
+
+  saveAndRender();
+}
+
+
+function renderDebts(){
+
+  const container = document.getElementById("debts");
+
+  container.innerHTML = "";
+
+  for(const d of debtDefinitions){
+
+    const settings = data.settings.debts[d.key];
+
+    const payment = getDebtPayment(d.key,monthKey());
+
+    const remaining = getDebtRemaining(d.key,monthKey());
+
+    const paidBefore = getDebtPaidBefore(d.key,monthKey());
+
+    const total = Number(settings.total)||0;
+
+    let progress = 0;
+
+    if(total > 0){
+
+      progress =
+        Math.min(
+          100,
+          Math.max(
+            0,
+            ((total - remaining) / total) * 100
+          )
+        );
     }
 
-    if(item.id==="rentDebt"){
-      return;
-    }
+    const div = document.createElement("div");
 
-    if(item.id==="light" || item.id==="gas"){
-      return;
-    }
+    div.className = "debt-box";
 
+    div.innerHTML = `
+      <div class="debt-header">
+        <strong>${d.name}</strong>
+        <span class="status">
+          ${payment > 0 ? "Rata prevista: "+euro(payment) : "Nessuna rata questo mese"}
+        </span>
+      </div>
 
-    if(item.id==="rent"){
+      <div class="row3">
 
-      const previous=previousKey(currentKey);
-
-      const previousMonth=data[previous];
-
-      const amount=
-        previousMonth?.expenses?.rent ?? "";
-
-      const row=document.createElement("div");
-
-      row.className="expense-row";
-
-      row.innerHTML=`
-
-        <div>
-
-          <strong>Affitto mese precedente</strong>
-
-          <div class="small">
-            Importo riferito a ${monthLabel(previous)}.
-            Viene conteggiato come uscita in ${monthLabel(currentKey)}.
-          </div>
-
+        <div class="field">
+          <label>Debito totale</label>
           <input
             type="number"
+            min="0"
             step="0.01"
-            value="${amount}"
-            placeholder="Importo"
-            data-rent-reference="${previous}"
+            value="${settings.total || ""}"
+            oninput="updateDebt('${d.key}','total',this.value)"
           >
-
         </div>
 
-        <div>
-          <strong>${money(amount||0)}</strong>
+        <div class="field">
+          <label>Rata mensile</label>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value="${settings.installment || ""}"
+            oninput="updateDebt('${d.key}','installment',this.value)"
+          >
         </div>
 
-      `;
+        <div class="field">
+          <label>Prima rata</label>
+          <input
+            type="month"
+            value="${settings.start || "2026-10"}"
+            onchange="updateDebt('${d.key}','start',this.value)"
+          >
+        </div>
 
-      const input=row.querySelector("input");
+      </div>
 
-      input.addEventListener("input",e=>{
+      <div class="small">
+        ${payment > 0
+          ? "Rata di questo mese: <strong>"+euro(payment)+"</strong>"
+          : "Nessun pagamento previsto"}
+      </div>
 
-        const ref=e.target.dataset.rentReference;
+      <div class="small">
+        Residuo dopo questo mese: <strong>${euro(remaining)}</strong>
+      </div>
 
-        getMonth(ref).expenses.rent=
-          Number(e.target.value)||0;
+      <div class="small">
+        Totale già pagato prima di questo mese: ${euro(paidBefore)}
+      </div>
 
-        save();
-        renderSummary();
+      <div class="progress">
+        <div style="width:${progress}%"></div>
+      </div>
+    `;
 
-      });
+    container.appendChild(div);
+  }
+}
 
-      container.appendChild(row);
 
-      return;
+function updateDebt(key,field,value){
 
+  data.settings.debts[key][field] =
+    field === "start"
+      ? value
+      : Number(value)||0;
+
+  saveData();
+
+  render();
+}
+
+
+function getDebtPayment(debtKey,key){
+
+  const debt = data.settings.debts[debtKey];
+
+  const total = Number(debt.total)||0;
+  const installment = Number(debt.installment)||0;
+
+  if(total <= 0 || installment <= 0 || !debt.start){
+    return 0;
+  }
+
+  if(key < debt.start){
+    return 0;
+  }
+
+  const monthsElapsed = monthsBetween(debt.start,key);
+
+  const alreadyPaid =
+    monthsElapsed * installment;
+
+  if(alreadyPaid >= total){
+    return 0;
+  }
+
+  const remaining = total - alreadyPaid;
+
+  return Math.min(installment,remaining);
+}
+
+
+function getDebtPaidBefore(debtKey,key){
+
+  const debt = data.settings.debts[debtKey];
+
+  const total = Number(debt.total)||0;
+  const installment = Number(debt.installment)||0;
+
+  if(total <= 0 || installment <= 0 || !debt.start){
+    return 0;
+  }
+
+  if(key <= debt.start){
+    return 0;
+  }
+
+  const monthsElapsed = monthsBetween(debt.start,key);
+
+  return Math.min(
+    total,
+    monthsElapsed * installment
+  );
+}
+
+
+function getDebtRemaining(debtKey,key){
+
+  const debt = data.settings.debts[debtKey];
+
+  const total = Number(debt.total)||0;
+
+  if(total <= 0){
+    return 0;
+  }
+
+  const paidBefore = getDebtPaidBefore(debtKey,key);
+  const payment = getDebtPayment(debtKey,key);
+
+  return Math.max(
+    0,
+    total - paidBefore - payment
+  );
+}
+
+
+function monthsBetween(startKey,endKey){
+
+  const a = parseMonthKey(startKey);
+  const b = parseMonthKey(endKey);
+
+  return (
+    (b.getFullYear()-a.getFullYear())*12
+    +
+    (b.getMonth()-a.getMonth())
+  );
+}
+
+
+function getDebtPaymentsForMonth(key){
+
+  let total = 0;
+
+  for(const d of debtDefinitions){
+    total += getDebtPayment(d.key,key);
+  }
+
+  return total;
+}
+
+
+function getOrdinaryExpenses(month){
+
+  let total = Number(month.rentPrevious)||0;
+
+  for(const e of ordinaryDefinitions){
+
+    total += Number(
+      month.expenses[e.key]
+    ) || 0;
+  }
+
+  return total;
+}
+
+
+function getUtilityStateUntil(targetKey){
+
+  let utilityFund = 0;
+  let generalFund = 0;
+
+  const allKeys = getRelevantMonthKeys(targetKey);
+
+  for(const key of allKeys){
+
+    const month = getMonthData(key);
+
+    const contribution =
+      (Number(month.contributionUser)||0)
+      +
+      (Number(month.contributionPartner)||0);
+
+    const utilityProvision =
+      (Number(data.settings.lightProvision)||0)
+      +
+      (Number(data.settings.gasProvision)||0);
+
+    const utilityPaid =
+      (Number(month.lightPaid)||0)
+      +
+      (Number(month.gasPaid)||0);
+
+    const nonUtilityExpenses =
+      getOrdinaryExpenses(month)
+      +
+      getDebtPaymentsForMonth(key);
+
+    /*
+      Prima separiamo i soldi destinati alle utenze.
+      Il resto del contributo casa rimane disponibile
+      per il normale accantonamento generale.
+    */
+
+    let generalMonthly =
+      contribution
+      -
+      utilityProvision
+      -
+      nonUtilityExpenses
+      +
+      (Number(month.interest)||0);
+
+    utilityFund +=
+      utilityProvision
+      -
+      utilityPaid;
+
+    /*
+      Se il salvadanaio Luce + Gas va sotto zero,
+      il deficit viene coperto dall'accantonamento generale.
+    */
+
+    if(utilityFund < 0){
+
+      generalMonthly += utilityFund;
+
+      utilityFund = 0;
     }
 
-
-    const row=document.createElement("div");
-
-    row.className="expense-row";
-
-    const value=
-      m.expenses[item.id] ??
-      item.defaultAmount ??
-      0;
-
-    row.innerHTML=`
-
-      <div>
-
-        <strong>${item.name}</strong>
-
-      </div>
-
-      <div>
-
-        <input
-          type="number"
-          step="0.01"
-          value="${value}"
-          data-expense="${item.id}"
-        >
-
-      </div>
-
-    `;
-
-    const input=row.querySelector("input");
-
-    input.addEventListener("input",e=>{
-
-      const id=e.target.dataset.expense;
-
-      m.expenses[id]=Number(e.target.value)||0;
-
-      save();
-      renderSummary();
-
-    });
-
-    container.appendChild(row);
-
-  });
-
-
-  /*
-    RISCALDAMENTO
-  */
-
-  const heatingRow=document.createElement("div");
-
-  heatingRow.className="expense-row";
-
-  heatingRow.innerHTML=`
-
-    <div>
-
-      <strong>Riscaldamento</strong>
-
-      <div class="small">
-        Gestito come debito a rate.
-      </div>
-
-      <div style="margin-top:8px">
-
-        <label>Debito totale</label>
-
-        <input
-          type="number"
-          step="0.01"
-          value="${m.heatingDebt||""}"
-          id="heatingDebtInput"
-        >
-
-      </div>
-
-      <div style="margin-top:8px">
-
-        <label>Rata mensile</label>
-
-        <input
-          type="number"
-          step="0.01"
-          value="${m.heatingInstallment||""}"
-          id="heatingInstallmentInput"
-        >
-
-      </div>
-
-      <div style="margin-top:8px">
-
-        <label>Prima rata</label>
-
-        <input
-          type="month"
-          value="${m.heatingStart||""}"
-          id="heatingStartInput"
-        >
-
-      </div>
-
-    </div>
-
-    <div>
-
-      <strong>${money(heatingPayment(currentKey))}</strong>
-
-    </div>
-
-  `;
-
-  container.appendChild(heatingRow);
-
-
-  document
-    .getElementById("heatingDebtInput")
-    .addEventListener("input",e=>{
-
-      m.heatingDebt=Number(e.target.value)||0;
-
-      save();
-      render();
-
-    });
-
-
-  document
-    .getElementById("heatingInstallmentInput")
-    .addEventListener("input",e=>{
-
-      m.heatingInstallment=
-        Number(e.target.value)||0;
-
-      save();
-      render();
-
-    });
-
-
-  document
-    .getElementById("heatingStartInput")
-    .addEventListener("change",e=>{
-
-      m.heatingStart=e.target.value;
-
-      save();
-      render();
-
-    });
-
-
-  /*
-    FINANZIAMENTO PROPRIETARIO
-  */
-
-  const ownerRow=document.createElement("div");
-
-  ownerRow.className="expense-row";
-
-  ownerRow.innerHTML=`
-
-    <div>
-      <strong>Finanziamento proprietario</strong>
-
-      <div class="small">
-        Pagamento automatico in base a debito,
-        rata e prima rata.
-      </div>
-    </div>
-
-    <div>
-      <strong>${money(ownerPayment(currentKey))}</strong>
-    </div>
-
-  `;
-
-  container.appendChild(ownerRow);
-
-
-  /*
-    ARRETRATO
-  */
-
-  const rentDebtRow=document.createElement("div");
-
-  rentDebtRow.className="expense-row";
-
-  rentDebtRow.innerHTML=`
-
-    <div>
-      <strong>Rata arretrato affitto</strong>
-
-      <div class="small">
-        Pagamento automatico in base al debito,
-        alla rata e alla prima rata.
-      </div>
-    </div>
-
-    <div>
-      <strong>${money(rentDebtPayment(currentKey))}</strong>
-    </div>
-
-  `;
-
-  container.appendChild(rentDebtRow);
-
-}
-
-
-/* -------------------------
-   DEBITI INFO
-------------------------- */
-
-function renderDebtInfo(){
-
-  const m=getMonth(currentKey);
-
-  /*
-    PROPRIETARIO
-  */
-
-  const ownerTotal=Number(m.ownerDebt)||0;
-  const ownerInstallment=Number(m.ownerInstallment)||0;
-  const ownerStart=m.ownerStart||"";
-
-  const ownerRemaining=debtRemaining(
-    ownerTotal,
-    ownerInstallment,
-    ownerStart,
-    currentKey
-  );
-
-  const ownerPaid=debtPaid(
-    ownerTotal,
-    ownerInstallment,
-    ownerStart,
-    currentKey
-  );
-
-  const ownerPercent=
-    ownerTotal>0
-      ? Math.min(100,(ownerPaid/ownerTotal)*100)
-      : 0;
-
-  document.getElementById("ownerDebtInfo").innerHTML=`
-
-    <strong>Pagamento di ${monthLabel(currentKey)}:</strong>
-    ${money(ownerPayment(currentKey))}
-
-    <br><br>
-
-    <strong>Debito residuo dopo il pagamento:</strong>
-    ${money(ownerRemaining)}
-
-    <div class="debt-progress">
-      <div
-        class="debt-progress-bar"
-        style="width:${ownerPercent}%"
-      ></div>
-    </div>
-
-    <div class="small">
-      Pagato: ${money(ownerPaid)}
-      · ${ownerPercent.toFixed(1)}%
-      <br>
-      Ultima rata prevista:
-      ${debtLastMonth(ownerTotal,ownerInstallment,ownerStart)
-        ? monthLabel(debtLastMonth(ownerTotal,ownerInstallment,ownerStart))
-        : "—"}
-    </div>
-
-  `;
-
-
-  /*
-    ARRETRATO
-  */
-
-  const rentTotal=Number(m.rentDebt)||0;
-  const rentInstallment=Number(m.rentInstallment)||0;
-  const rentStart=m.rentStart||"";
-
-  const rentRemaining=debtRemaining(
-    rentTotal,
-    rentInstallment,
-    rentStart,
-    currentKey
-  );
-
-  const rentPaid=debtPaid(
-    rentTotal,
-    rentInstallment,
-    rentStart,
-    currentKey
-  );
-
-  const rentPercent=
-    rentTotal>0
-      ? Math.min(100,(rentPaid/rentTotal)*100)
-      : 0;
-
-  document.getElementById("rentDebtInfo").innerHTML=`
-
-    <strong>Rata di ${monthLabel(currentKey)}:</strong>
-    ${money(rentDebtPayment(currentKey))}
-
-    <br><br>
-
-    <strong>Debito residuo dopo il pagamento:</strong>
-    ${money(rentRemaining)}
-
-    <div class="debt-progress">
-      <div
-        class="debt-progress-bar"
-        style="width:${rentPercent}%"
-      ></div>
-    </div>
-
-    <div class="small">
-      Pagato: ${money(rentPaid)}
-      · ${rentPercent.toFixed(1)}%
-      <br>
-      Ultima rata prevista:
-      ${debtLastMonth(rentTotal,rentInstallment,rentStart)
-        ? monthLabel(debtLastMonth(rentTotal,rentInstallment,rentStart))
-        : "—"}
-    </div>
-
-  `;
-
-}
-
-
-/* -------------------------
-   UTILITY INFO
-------------------------- */
-
-function renderUtilityInfo(){
-
-  const m=getMonth(currentKey);
-
-  /*
-    LUCE
-  */
-
-  const lightForecast=
-    (Number(m.lightForecast)||0)*2;
-
-  let lightText=
-    "Previsione per 2 mesi: "+money(lightForecast);
-
-  if(
-    m.lightBill!=="" &&
-    m.lightBillMonth===currentKey
-  ){
-
-    const real=Number(m.lightBill)||0;
-    const difference=lightForecast-real;
-
-    lightText+=`
-      <br>
-      Bolletta reale: ${money(real)}
-      <br>
-      Differenza accantonamento:
-      <strong class="${difference>=0?"positive":"negative"}">
-        ${difference>=0?"+":""}${money(difference)}
-      </strong>
-    `;
-
+    generalFund += generalMonthly;
   }
 
-  document.getElementById("lightInfo").innerHTML=lightText;
-
-
-  /*
-    GAS
-  */
-
-  const gasForecast=
-    (Number(m.gasForecast)||0)*2;
-
-  let gasText=
-    "Previsione per 2 mesi: "+money(gasForecast);
-
-  if(
-    m.gasBill!=="" &&
-    m.gasBillMonth===currentKey
-  ){
-
-    const real=Number(m.gasBill)||0;
-    const difference=gasForecast-real;
-
-    gasText+=`
-      <br>
-      Bolletta reale: ${money(real)}
-      <br>
-      Differenza accantonamento:
-      <strong class="${difference>=0?"positive":"negative"}">
-        ${difference>=0?"+":""}${money(difference)}
-      </strong>
-    `;
-
-  }
-
-  document.getElementById("gasInfo").innerHTML=gasText;
-
+  return {
+    generalFund,
+    utilityFund
+  };
 }
 
 
-/* -------------------------
-   SUMMARY
-------------------------- */
+function getRelevantMonthKeys(targetKey){
+
+  const keys = Object.keys(data.months);
+
+  /*
+    Assicuriamo che venga considerato almeno il mese
+    attualmente visualizzato.
+  */
+
+  if(!keys.includes(targetKey)){
+    keys.push(targetKey);
+  }
+
+  return keys
+    .filter(k => k >= "2026-10" && k <= targetKey)
+    .sort();
+}
+
+
+function getCurrentMonthCalculation(){
+
+  const key = monthKey();
+  const month = getMonthData(key);
+
+  const contribution =
+    (Number(month.contributionUser)||0)
+    +
+    (Number(month.contributionPartner)||0);
+
+  const utilityProvision =
+    (Number(data.settings.lightProvision)||0)
+    +
+    (Number(data.settings.gasProvision)||0);
+
+  const utilityPaid =
+    (Number(month.lightPaid)||0)
+    +
+    (Number(month.gasPaid)||0);
+
+  const nonUtilityExpenses =
+    getOrdinaryExpenses(month)
+    +
+    getDebtPaymentsForMonth(key);
+
+  let generalMonthly =
+    contribution
+    -
+    utilityProvision
+    -
+    nonUtilityExpenses
+    +
+    (Number(month.interest)||0);
+
+  /*
+    Calcoliamo il saldo utenze PRIMA di questo mese.
+  */
+
+  const previousKey =
+    previousMonthKey(key);
+
+  let utilityBefore = 0;
+
+  if(previousKey >= "2026-10"){
+
+    const previousState =
+      getUtilityStateUntil(previousKey);
+
+    utilityBefore = previousState.utilityFund;
+  }
+
+  const utilityAfterBeforeCoverage =
+    utilityBefore
+    +
+    utilityProvision
+    -
+    utilityPaid;
+
+  let utilityCoverage = 0;
+
+  if(utilityAfterBeforeCoverage < 0){
+
+    utilityCoverage =
+      Math.abs(utilityAfterBeforeCoverage);
+
+    generalMonthly -= utilityCoverage;
+  }
+
+  const utilityAfter =
+    Math.max(
+      0,
+      utilityAfterBeforeCoverage
+    );
+
+  return {
+    contribution,
+    utilityProvision,
+    utilityPaid,
+    nonUtilityExpenses,
+    generalMonthly,
+    utilityBefore,
+    utilityCoverage,
+    utilityAfter
+  };
+}
+
+
+function previousMonthKey(key){
+
+  const date = parseMonthKey(key);
+
+  date.setMonth(date.getMonth()-1);
+
+  return monthKey(date);
+}
+
 
 function renderSummary(){
 
-  const m=getMonth(currentKey);
+  const key = monthKey();
+  const month = getMonthData(key);
 
-  const salary=
-    (Number(m.salary1)||0)+
-    (Number(m.salary2)||0);
+  const calc = getCurrentMonthCalculation();
 
-  const fund=
-    (Number(m.contribution1)||0)+
-    (Number(m.contribution2)||0);
+  const cumulative =
+    getUtilityStateUntil(key);
 
-  const expenses=expensesTotal(currentKey);
+  const totalSalaries =
+    (Number(month.salaryUser)||0)
+    +
+    (Number(month.salaryPartner)||0);
 
-  const utilityAdjustment=
-    utilityAdjustmentForMonth(currentKey);
+  document.getElementById("totalSalaries").textContent =
+    euro(totalSalaries);
 
-  const interest=monthInterest(currentKey);
+  document.getElementById("houseFund").textContent =
+    euro(calc.contribution);
 
-  const balance=
-    fund-
-    expenses+
-    utilityAdjustment+
-    interest;
+  document.getElementById("nonUtilityExpenses").textContent =
+    euro(calc.nonUtilityExpenses);
 
-  const cumulative=
-    cumulativeUntil(currentKey);
+  document.getElementById("utilityProvisionTotal").textContent =
+    euro(calc.utilityProvision);
 
-  document.getElementById("summarySalary").textContent=
-    money(salary);
+  document.getElementById("utilityPaidTotal").textContent =
+    euro(calc.utilityPaid);
 
-  document.getElementById("summaryFund").textContent=
-    money(fund);
+  const monthlyEl =
+    document.getElementById("monthlyGeneralResult");
 
-  document.getElementById("summaryExpenses").textContent=
-    money(expenses);
+  monthlyEl.textContent =
+    euro(calc.generalMonthly);
 
-  const balanceEl=
-    document.getElementById("summaryBalance");
+  monthlyEl.className =
+    "value " +
+    (calc.generalMonthly >= 0
+      ? "green-text"
+      : "red-text");
 
-  balanceEl.textContent=money(balance);
+  document.getElementById("generalCumulative").textContent =
+    euro(cumulative.generalFund);
 
-  balanceEl.className=
-    "big "+(balance>=0?"positive":"negative");
+  document.getElementById("utilityCumulative").textContent =
+    euro(cumulative.utilityFund);
 
-  const cumulativeEl=
-    document.getElementById("summaryCumulative");
+  document.getElementById("utilityBalance").textContent =
+    euro(cumulative.utilityFund);
 
-  cumulativeEl.textContent=money(cumulative);
+  document.getElementById("totalSaved").textContent =
+    euro(
+      cumulative.generalFund
+      +
+      cumulative.utilityFund
+    );
 
-  cumulativeEl.className=
-    "big "+(cumulative>=0?"positive":"negative");
+  /*
+    Messaggio salvadanaio utenze
+  */
 
-}
+  let utilityMessage = "";
 
+  if(calc.utilityCoverage > 0){
 
-/* -------------------------
-   GOAL
-------------------------- */
+    utilityMessage =
+      "La bolletta di questo mese supera il salvadanaio disponibile. " +
+      "Sono stati coperti automaticamente " +
+      euro(calc.utilityCoverage) +
+      " dall'accantonamento generale.";
 
-function renderGoal(){
+  }else{
 
-  const m=getMonth(currentKey);
-
-  const goal=Number(m.savingGoal)||0;
-
-  const cumulative=cumulativeUntil(currentKey);
-
-  if(!goal){
-
-    document.getElementById("goalInfo").innerHTML=
-      "Inserisci un obiettivo per vedere il progresso.";
-
-    return;
-
+    utilityMessage =
+      "Il salvadanaio Luce + Gas resta separato dall'accantonamento generale.";
   }
 
-  const percentage=
-    Math.min(100,Math.max(0,(cumulative/goal)*100));
+  document.getElementById("utilityMessage").textContent =
+    utilityMessage;
 
-  document.getElementById("goalInfo").innerHTML=`
+  /*
+    Messaggio generale
+  */
 
-    <strong>${money(cumulative)}</strong>
-    accumulati su
-    <strong>${money(goal)}</strong>
+  let generalMessage = "";
 
-    <div class="debt-progress">
-      <div
-        class="debt-progress-bar"
-        style="width:${percentage}%"
-      ></div>
-    </div>
+  if(calc.generalMonthly >= 0){
 
-    <div class="small">
-      Progresso: ${percentage.toFixed(1)}%
-      <br>
-      Mancano: ${money(Math.max(0,goal-cumulative))}
-    </div>
+    generalMessage =
+      "Questo mese l'accantonamento generale aumenta di " +
+      euro(calc.generalMonthly) +
+      ".";
 
-  `;
+  }else{
 
-}
-
-
-/* -------------------------
-   EVENTI
-------------------------- */
-
-function updateCurrentField(field,value){
-
-  const m=getMonth(currentKey);
-
-  m[field]=value;
-
-  save();
-
-  renderSummary();
-  renderGoal();
-
-}
-
-
-document.getElementById("monthPicker")
-.addEventListener("change",e=>{
-
-  currentKey=e.target.value;
-
-  if(!currentKey){
-    currentKey=currentMonthKey();
-    e.target.value=currentKey;
+    generalMessage =
+      "Questo mese l'accantonamento generale diminuisce di " +
+      euro(Math.abs(calc.generalMonthly)) +
+      ".";
   }
 
-  getMonth(currentKey);
+  document.getElementById("generalMessage").textContent =
+    generalMessage;
 
-  save();
-  render();
+  /*
+    Obiettivo
+  */
 
-});
+  const goal =
+    Number(data.settings.goal)||0;
 
+  const goalText =
+    document.getElementById("goalText");
 
-document.getElementById("salary1")
-.addEventListener("input",e=>{
-  updateCurrentField("salary1",Number(e.target.value)||0);
-});
+  const goalProgress =
+    document.getElementById("goalProgress");
 
+  if(goal > 0){
 
-document.getElementById("salary2")
-.addEventListener("input",e=>{
-  updateCurrentField("salary2",Number(e.target.value)||0);
-});
+    const saved =
+      cumulative.generalFund
+      +
+      cumulative.utilityFund;
 
+    const percentage =
+      Math.min(
+        100,
+        Math.max(
+          0,
+          (saved/goal)*100
+        )
+      );
 
-document.getElementById("contribution1")
-.addEventListener("input",e=>{
-  updateCurrentField(
-    "contribution1",
-    Number(e.target.value)||0
-  );
-});
+    goalText.textContent =
+      euro(saved) +
+      " su " +
+      euro(goal) +
+      " (" +
+      percentage.toFixed(1) +
+      "%)";
 
+    goalProgress.style.width =
+      percentage + "%";
 
-document.getElementById("contribution2")
-.addEventListener("input",e=>{
-  updateCurrentField(
-    "contribution2",
-    Number(e.target.value)||0
-  );
-});
+  }else{
 
+    goalText.textContent =
+      "Nessun obiettivo impostato.";
 
-document.getElementById("bankInterest")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "bankInterest",
-    Number(e.target.value)||0
-  );
-
-});
-
-
-document.getElementById("savingGoal")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "savingGoal",
-    Number(e.target.value)||0
-  );
-
-});
+    goalProgress.style.width =
+      "0%";
+  }
+}
 
 
-/*
-  Proprietario
-*/
+function saveAndRender(){
 
-document.getElementById("ownerDebt")
-.addEventListener("input",e=>{
+  const key = monthKey();
 
-  updateCurrentField(
-    "ownerDebt",
-    Number(e.target.value)||0
-  );
+  const month = getMonthData(key);
 
-  render();
+  month.salaryUser =
+    numberValue("salaryUser");
 
-});
+  month.salaryPartner =
+    numberValue("salaryPartner");
 
+  month.contributionUser =
+    numberValue("contributionUser");
 
-document.getElementById("ownerInstallment")
-.addEventListener("input",e=>{
+  month.contributionPartner =
+    numberValue("contributionPartner");
 
-  updateCurrentField(
-    "ownerInstallment",
-    Number(e.target.value)||0
-  );
+  month.interest =
+    numberValue("interest");
 
-  render();
+  month.rentPrevious =
+    numberValue("rentPrevious");
 
-});
+  month.lightPaid =
+    numberValue("lightPaid");
 
+  month.gasPaid =
+    numberValue("gasPaid");
 
-document.getElementById("ownerStart")
-.addEventListener("change",e=>{
+  data.settings.lightProvision =
+    numberValue("lightProvision");
 
-  updateCurrentField(
-    "ownerStart",
-    e.target.value
-  );
+  data.settings.gasProvision =
+    numberValue("gasProvision");
 
-  render();
+  data.settings.goal =
+    numberValue("goal");
 
-});
+  saveData();
 
+  /*
+    Render senza perdere il focus dell'input.
+    Viene comunque aggiornato il riepilogo.
+  */
 
-/*
-  Arretrato
-*/
-
-document.getElementById("rentDebt")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "rentDebt",
-    Number(e.target.value)||0
-  );
-
-  render();
-
-});
-
-
-document.getElementById("rentInstallment")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "rentInstallment",
-    Number(e.target.value)||0
-  );
-
-  render();
-
-});
-
-
-document.getElementById("rentStart")
-.addEventListener("change",e=>{
-
-  updateCurrentField(
-    "rentStart",
-    e.target.value
-  );
-
-  render();
-
-});
-
-
-/*
-  Luce
-*/
-
-document.getElementById("lightForecast")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "lightForecast",
-    Number(e.target.value)||0
-  );
-
-  renderUtilityInfo();
   renderSummary();
+}
 
-});
-
-
-document.getElementById("lightBill")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "lightBill",
-    e.target.value
-  );
-
-  renderUtilityInfo();
-  renderSummary();
-
-});
-
-
-document.getElementById("lightBillMonth")
-.addEventListener("change",e=>{
-
-  updateCurrentField(
-    "lightBillMonth",
-    e.target.value
-  );
-
-  renderUtilityInfo();
-  renderSummary();
-
-});
-
-
-/*
-  Gas
-*/
-
-document.getElementById("gasForecast")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "gasForecast",
-    Number(e.target.value)||0
-  );
-
-  renderUtilityInfo();
-  renderSummary();
-
-});
-
-
-document.getElementById("gasBill")
-.addEventListener("input",e=>{
-
-  updateCurrentField(
-    "gasBill",
-    e.target.value
-  );
-
-  renderUtilityInfo();
-  renderSummary();
-
-});
-
-
-document.getElementById("gasBillMonth")
-.addEventListener("change",e=>{
-
-  updateCurrentField(
-    "gasBillMonth",
-    e.target.value
-  );
-
-  renderUtilityInfo();
-  renderSummary();
-
-});
-
-
-/* -------------------------
-   COPIA MESE PRECEDENTE
-------------------------- */
 
 function copyPreviousMonth(){
 
-  const previous=previousKey(currentKey);
+  const currentKey = monthKey();
 
-  if(!data[previous]){
+  const previousKey =
+    previousMonthKey(currentKey);
 
-    alert(
-      "Non ci sono dati salvati per il mese precedente."
-    );
+  if(previousKey < "2026-10"){
+
+    alert("Non ci sono dati del mese precedente da copiare.");
 
     return;
-
   }
 
-  const source=data[previous];
+  const previous =
+    getMonthData(previousKey);
 
-  const target=getMonth(currentKey);
-
-  target.expenses=
-    JSON.parse(JSON.stringify(source.expenses||{}));
+  const current =
+    getMonthData(currentKey);
 
   /*
-    Le bollette reali non vengono copiate,
-    perché appartengono al singolo mese.
+    Copiamo solo le spese ordinarie.
+    NON copiamo:
+    - stipendi
+    - contributi
+    - interessi
+    - affitto precedente
+    - bollette luce/gas
   */
 
-  target.lightBill="";
-  target.lightBillMonth="";
+  for(const e of ordinaryDefinitions){
 
-  target.gasBill="";
-  target.gasBillMonth="";
+    current.expenses[e.key] =
+      previous.expenses[e.key] ?? e.default;
+  }
 
-  save();
+  saveData();
 
   render();
 
+  alert("Spese ordinarie copiate dal mese precedente.");
 }
 
 
-/* -------------------------
-   RESET
-------------------------- */
+function resetData(){
 
-function resetAll(){
+  const confirmation =
+    confirm(
+      "ATTENZIONE: vuoi cancellare tutti i dati del Budget Casa?"
+    );
 
-  if(
-    !confirm(
-      "Sei sicura di voler cancellare tutti i dati?"
-    )
-  ){
+  if(!confirmation){
     return;
   }
 
   localStorage.removeItem(STORAGE_KEY);
 
-  data={};
+  data = createInitialData();
 
-  currentKey=currentMonthKey();
-
-  document.getElementById("monthPicker").value=
-    currentKey;
-
-  getMonth(currentKey);
+  currentDate =
+    new Date(START_YEAR,START_MONTH,1);
 
   render();
-
 }
 
 
-/* -------------------------
-   AVVIO
-------------------------- */
+/*
+  Quando viene modificato direttamente un campo
+  delle entrate o delle utenze, il salvataggio avviene
+  senza dover premere un pulsante.
+*/
 
-currentKey=currentMonthKey();
+document.addEventListener("input",function(e){
 
-document.getElementById("monthPicker").value=
-  currentKey;
+  if(
+    e.target.matches("input")
+    &&
+    (
+      e.target.id === "salaryUser" ||
+      e.target.id === "salaryPartner" ||
+      e.target.id === "contributionUser" ||
+      e.target.id === "contributionPartner" ||
+      e.target.id === "interest" ||
+      e.target.id === "rentPrevious" ||
+      e.target.id === "lightProvision" ||
+      e.target.id === "gasProvision" ||
+      e.target.id === "lightPaid" ||
+      e.target.id === "gasPaid" ||
+      e.target.id === "goal"
+    )
+  ){
 
-getMonth(currentKey);
+    saveAndRender();
+  }
 
-save();
+});
+
 
 render();
 
