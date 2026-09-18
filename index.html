@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Budget Casa</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f5f3ff;
+    color: #202124;
+}
+
+header {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: white;
+    padding: 22px 18px 25px;
+    border-radius: 0 0 25px 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.12);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 25px;
+}
+
+header p {
+    margin: 5px 0 0;
+    opacity: .9;
+    font-size: 14px;
+}
+
+.container {
+    max-width: 680px;
+    margin: auto;
+    padding: 15px;
+}
+
+.month-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 15px 0;
+    background: white;
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.month-selector button {
+    border: 0;
+    background: #ede9fe;
+    color: #6d28d9;
+    border-radius: 10px;
+    width: 42px;
+    height: 38px;
+    font-size: 20px;
+}
+
+.month-name {
+    font-weight: 700;
+    font-size: 18px;
+    text-transform: capitalize;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 17px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+
+.card h2 {
+    margin: 0 0 13px;
+    font-size: 18px;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 10px;
+}
+
+.icon {
+    width: 32px;
+    text-align: center;
+    font-size: 19px;
+}
+
+.name {
+    flex: 1;
+    font-size: 14px;
+}
+
+.amount {
+    width: 105px;
+    text-align: right;
+}
+
+input, select {
+    border: 1px solid #ddd6fe;
+    border-radius: 9px;
+    padding: 9px;
+    font-size: 15px;
+    background: white;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #eee;
+    padding-top: 12px;
+    margin-top: 12px;
+    font-weight: 700;
+}
+
+.info-box {
+    background: #faf5ff;
+    border: 1px solid #ddd6fe;
+    border-radius: 13px;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.house-total {
+    font-size: 22px;
+    font-weight: 800;
+    color: #6d28d9;
+}
+
+.result-card {
+    background: linear-gradient(135deg, #ede9fe, #faf5ff);
+}
+
+.result {
+    text-align: center;
+    padding: 12px 0;
+}
+
+.result-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.result-value {
+    font-size: 34px;
+    font-weight: 800;
+    margin-top: 5px;
+}
+
+.positive {
+    color: #15803d;
+}
+
+.negative {
+    color: #dc2626;
+}
+
+.savings-box {
+    background: #111827;
+    color: white;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 15px;
+}
+
+.savings-box h2 {
+    margin: 0 0 5px;
+    font-size: 17px;
+}
+
+.savings-value {
+    font-size: 31px;
+    font-weight: 800;
+}
+
+.savings-description {
+    color: #d1d5db;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.expense-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.expense-settings {
+    background: #fafafa;
+    border-radius: 12px;
+    padding: 11px;
+    margin: 0 0 12px 40px;
+}
+
+.expense-settings label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.date-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.date-grid input {
+    width: 100%;
+}
+
+.delete-btn {
+    border: 0;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+}
+
+.add-expense {
+    margin-top: 8px;
+    border: 2px dashed #c4b5fd;
+    background: #faf5ff;
+    color: #6d28d9;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.history-row:last-child {
+    border-bottom: none;
+}
+
+.small {
+    font-size: 12px;
+    color: #777;
+}
+
+.primary {
+    width: 100%;
+    border: 0;
+    background: #7c3aed;
+    color: white;
+    padding: 13px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.secondary {
+    width: 100%;
+    border: 0;
+    background: #ede9fe;
+    color: #6d28d9;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.danger {
+    width: 100%;
+    border: 0;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.footer {
+    text-align: center;
+    color: #888;
+    font-size: 11px;
+    padding: 20px;
+}
+
+.goal-progress {
+    margin-top: 12px;
+    background: #374151;
+    height: 10px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.goal-bar {
+    height: 100%;
+    background: #a78bfa;
+    width: 0%;
+    transition: width .3s;
+}
+
+.goal-text {
+    font-size: 12px;
+    color: #d1d5db;
+    margin-top: 6px;
+}
+
+@media (max-width: 430px) {
+    .amount {
+        width: 90px;
+    }
+
+    .expense-settings {
+        margin-left: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🏠 Budget Casa</h1>
+    <p>Il nostro budget familiare</p>
+</header>
+
+<div class="container">
+
+    <!-- MESE -->
+    <div class="month-selector">
+        <button onclick="changeMonth(-1)">‹</button>
+        <div class="month-name" id="monthName"></div>
+        <button onclick="changeMonth(1)">›</button>
+    </div>
+
+    <!-- STIPENDI REALI -->
+    <div class="card">
+        <h2>💶 Stipendi reali</h2>
+
+        <div class="row">
+            <div class="icon">👩</div>
+            <div class="name">Il mio stipendio</div>
+            <input
+                id="mySalary"
+                class="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                onchange="saveSalaries()"
+            >
+        </div>
+
+        <div class="row">
+            <div class="icon">👨</div>
+            <div class="name">Stipendio marito</div>
+            <input
+                id="husbandSalary"
+                class="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                onchange="saveSalaries()"
+            >
+        </div>
+
+        <div class="row">
+            <div class="icon">➕</div>
+            <div class="name">Altre entrate</div>
+            <input
+                id="otherIncome"
+                class="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                onchange="saveSalaries()"
+            >
+        </div>
+
+        <div class="total-line">
+            <span>Totale stipendi/entrate</span>
+            <span id="salaryTotal">€0,00</span>
+        </div>
+
+        <div class="info-box">
+            ℹ️ Gli stipendi sono solo informativi e possono cambiare ogni mese.
+            Non vengono usati per calcolare l'avanzo della casa.
+        </div>
+    </div>
+
+    <!-- QUOTE CASA -->
+    <div class="card">
+        <h2>🏠 Fondo spese casa</h2>
+
+        <div class="row">
+            <div class="icon">👩</div>
+            <div class="name">Quota mia</div>
+            <input
+                id="myHouseContribution"
+                class="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                value="600"
+                onchange="saveHouseContributions()"
+            >
+        </div>
+
+        <div class="row">
+            <div class="icon">👨</div>
+            <div class="name">Quota marito</div>
+            <input
+                id="husbandHouseContribution"
+                class="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                value="600"
+                onchange="saveHouseContributions()"
+            >
+        </div>
+
+        <div class="total-line">
+            <span>Fondo casa disponibile</span>
+            <span class="house-total" id="houseFund">€1.200,00</span>
+        </div>
+
+        <div class="info-box">
+            💜 Ogni mese partiamo dal fondo casa.
+            Di default sono €600 a testa, ma puoi modificarli quando vuoi.
+        </div>
+    </div>
+
+    <!-- SPESE -->
+    <div class="card">
+        <h2>📋 Spese della casa</h2>
+
+        <div id="expenses"></div>
+
+        <button class="add-expense" onclick="addExpense()">
+            ＋ Aggiungi una nuova spesa
+        </button>
+
+        <div class="total-line">
+            <span>Totale spese del mese</span>
+            <span id="totalExpenses">€0,00</span>
+        </div>
+    </div>
+
+    <!-- AVANZO -->
+    <div class="card result-card">
+        <div class="result">
+            <div class="result-label">
+                Avanzo / disavanzo del mese
+            </div>
+
+            <div
+                id="monthlyBalance"
+                class="result-value positive"
+            >
+                €0,00
+            </div>
+        </div>
+
+        <div class="info-box">
+            🟢 Se avanza denaro, viene aggiunto automaticamente
+            all'accantonamento.<br>
+            🔴 Se spendete più del fondo casa, il disavanzo viene
+            sottratto dall'accantonamento.
+        </div>
+    </div>
+
+    <!-- ACCANTONAMENTO -->
+    <div class="savings-box">
+
+        <h2>🏦 Accantonamento cumulativo</h2>
+
+        <div class="savings-description">
+            Somma degli avanzi dei mesi precedenti
+        </div>
+
+        <div
+            id="totalSaved"
+            class="savings-value"
+        >
+            €0,00
+        </div>
+
+        <div class="goal-progress">
+            <div
+                id="goalBar"
+                class="goal-bar"
+            ></div>
+        </div>
+
+        <div
+            id="goalText"
+            class="goal-text"
+        ></div>
+
+    </div>
+
+    <!-- OBIETTIVO -->
+    <div class="card">
+
+        <h2>🎯 Obiettivo di accantonamento</h2>
+
+        <div class="row">
+            <div class="icon">🎯</div>
+
+            <div class="name">
+                Obiettivo
+            </div>
+
+            <input
+                id="savingsGoal"
+                class="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                value="0"
+                onchange="saveGoal()"
+            >
+        </div>
+
+        <div class="small">
+            Inserisci, ad esempio, €1.000 per vedere quanto manca
+            al tuo obiettivo.
+        </div>
+
+    </div>
+
+    <!-- STORICO -->
+    <div class="card">
+
+        <h2>📊 Storico mensile</h2>
+
+        <div id="history"></div>
+
+    </div>
+
+    <button
+        class="secondary"
+        onclick="copyPreviousMonth()"
+    >
+        📋 Copia le spese dal mese precedente
+    </button>
+
+    <button
+        class="danger"
+        onclick="resetCurrentMonth()"
+    >
+        🗑️ Cancella dati del mese
+    </button>
+
+    <div class="footer">
+        Budget Casa • I dati vengono salvati localmente sul dispositivo.
+    </div>
+
+</div>
+
+<script>
+
+const STORAGE_KEY = "budgetCasaV2";
+
+const defaultExpenses = [
+    ["Affitto", "🏠"],
+    ["Arretrato affitto", "🔴"],
+    ["Finanziamento proprietario", "🏦"],
+    ["Riscaldamento", "🔥"],
+    ["Internet", "🌐"],
+    ["Luce", "💡"],
+    ["Gas", "🔥"],
+    ["Soris", "🗑️"],
+    ["Assicurazione macchina", "🚗"],
+    ["Netflix", "🎬"],
+    ["Amazon", "📦"],
+    ["Bolletta vecchia", "🧾"]
+];
+
+let data = JSON.parse(
+    localStorage.getItem(STORAGE_KEY) || "{}"
+);
+
+let currentDate = new Date();
+currentDate.setDate(1);
+
+function monthKey(date) {
+
+    return date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1).padStart(2, "0");
+
+}
+
+function formatMonth(date) {
+
+    return new Intl.DateTimeFormat("it-IT", {
+        month: "long",
+        year: "numeric"
+    }).format(date);
+
+}
+
+function euro(value) {
+
+    return new Intl.NumberFormat("it-IT", {
+        style: "currency",
+        currency: "EUR"
+    }).format(Number(value) || 0);
+
+}
+
+function saveData() {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
+
+}
+
+function createDefaultMonth(key) {
+
+    const month = {
+
+        salaries: {
+            me: 0,
+            husband: 0,
+            other: 0
+        },
+
+        house: {
+            me: 600,
+            husband: 600
+        },
+
+        expenses: []
+
+    };
+
+    defaultExpenses.forEach(item => {
+
+        month.expenses.push({
+
+            name: item[0],
+            icon: item[1],
+
+            amount: 0,
+
+            recurring: false,
+
+            start: key,
+
+            end: key
+
+        });
+
+    });
+
+    data[key] = month;
+
+    saveData();
+
+    return month;
+
+}
+
+function getMonthData(key) {
+
+    if (!data[key]) {
+
+        return createDefaultMonth(key);
+
+    }
+
+    /*
+       Compatibilità nel caso di dati precedenti
+    */
+
+    if (!data[key].salaries) {
+
+        data[key].salaries = {
+            me: 0,
+            husband: 0,
+            other: 0
+        };
+
+    }
+
+    if (!data[key].house) {
+
+        data[key].house = {
+            me: 600,
+            husband: 600
+        };
+
+    }
+
+    if (!data[key].expenses) {
+
+        data[key].expenses = [];
+
+    }
+
+    return data[key];
+
+}
+
+function render() {
+
+    const key = monthKey(currentDate);
+
+    const month = getMonthData(key);
+
+    document.getElementById("monthName").textContent =
+        formatMonth(currentDate);
+
+    document.getElementById("mySalary").value =
+        month.salaries.me;
+
+    document.getElementById("husbandSalary").value =
+        month.salaries.husband;
+
+    document.getElementById("otherIncome").value =
+        month.salaries.other;
+
+    document.getElementById("myHouseContribution").value =
+        month.house.me;
+
+    document.getElementById("husbandHouseContribution").value =
+        month.house.husband;
+
+    renderExpenses();
+
+    calculate();
+
+    renderHistory();
+
+}
+
+function saveSalaries() {
+
+    const key = monthKey(currentDate);
+
+    const month = getMonthData(key);
+
+    month.salaries.me =
+        Number(
+            document.getElementById("mySalary").value
+        ) || 0;
+
+    month.salaries.husband =
+        Number(
+            document.getElementById("husbandSalary").value
+        ) || 0;
+
+    month.salaries.other =
+        Number(
+            document.getElementById("otherIncome").value
+        ) || 0;
+
+    saveData();
+
+    calculate();
+
+    renderHistory();
+
+}
+
+function saveHouseContributions() {
+
+    const key = monthKey(currentDate);
+
+    const month = getMonthData(key);
+
+    month.house.me =
+        Number(
+            document.getElementById("myHouseContribution").value
+        ) || 0;
+
+    month.house.husband =
+        Number(
+            document.getElementById("husbandHouseContribution").value
+        ) || 0;
+
+    saveData();
+
+    calculate();
+
+    renderHistory();
+
+}
+
+function renderExpenses() {
+
+    const key = monthKey(currentDate);
+
+    const month = getMonthData(key);
+
+    const container =
+        document.getElementById("expenses");
+
+    container.innerHTML = "";
+
+    month.expenses.forEach((expense, index) => {
+
+        const row =
+            document.createElement("div");
+
+        row.className = "expense-row";
+
+        row.innerHTML = `
+
+            <div class="icon">
+                ${expense.icon || "💶"}
+            </div>
+
+            <div class="name">
+
+                <input
+                    style="width:100%;"
+                    value="${escapeHtml(expense.name)}"
+                    onchange="changeExpenseName(
+                        ${index},
+                        this.value
+                    )"
+                >
+
+            </div>
+
+            <input
+                class="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                value="${expense.amount || 0}"
+                onchange="changeExpenseAmount(
+                    ${index},
+                    this.value
+                )"
+            >
+
+            <button
+                class="delete-btn"
+                onclick="deleteExpense(${index})"
+            >
+                ×
+            </button>
+
+        `;
+
+        container.appendChild(row);
+
+        const settings =
+            document.createElement("div");
+
+        settings.className =
+            "expense-settings";
+
+        settings.innerHTML = `
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    ${expense.recurring ? "checked" : ""}
+                    onchange="changeRecurring(
+                        ${index},
+                        this.checked
+                    )"
+                >
+
+                Spesa/rata ricorrente
+
+            </label>
+
+            <div class="date-grid">
+
+                <div>
+
+                    <label>
+                        Inizia da
+                    </label>
+
+                    <input
+                        type="month"
+                        value="${expense.start || key}"
+                        onchange="changeStart(
+                            ${index},
+                            this.value
+                        )"
+                    >
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Finisce a
+                    </label>
+
+                    <input
+                        type="month"
+                        value="${expense.end || key}"
+                        onchange="changeEnd(
+                            ${index},
+                            this.value
+                        )"
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="small" style="margin-top:7px;">
+
+                ${
+                    expense.recurring
+                    ?
+                    "La spesa viene conteggiata automaticamente nei mesi compresi tra le due date."
+                    :
+                    "Se attivi la spesa ricorrente, puoi scegliere fino a quale mese deve essere conteggiata."
+                }
+
+            </div>
+
+        `;
+
+        container.appendChild(settings);
+
+    });
+
+}
+
+function changeExpenseName(index, value) {
+
+    const key = monthKey(currentDate);
+
+    getMonthData(key).expenses[index].name =
+        value || "Nuova spesa";
+
+    saveData();
+
+    render();
+
+}
+
+function changeExpenseAmount(index, value) {
+
+    const key = monthKey(currentDate);
+
+    getMonthData(key).expenses[index].amount =
+        Number(value) || 0;
+
+    saveData();
+
+    calculate();
+
+    renderHistory();
+
+}
+
+function changeRecurring(index, value) {
+
+    const key = monthKey(currentDate);
+
+    getMonthData(key).expenses[index].recurring =
+        value;
+
+    saveData();
+
+    calculate();
+
+    renderHistory();
+
+}
+
+function changeStart(index, value) {
+
+    const key = monthKey(currentDate);
+
+    getMonthData(key).expenses[index].start =
+        value;
+
+    saveData();
+
+    calculate();
+
+    renderHistory();
+
+}
+
+function changeEnd(index, value) {
+
+    const key = monthKey(currentDate);
+
+    getMonthData(key).expenses[index].end =
+        value;
+
+    saveData();
+
+    calculate();
+
+    renderHistory();
+
+}
+
+function deleteExpense(index) {
+
+    const key = monthKey(currentDate);
+
+    getMonthData(key).expenses.splice(
+        index,
+        1
+    );
+
+    saveData();
+
+    render();
+
+}
+
+function addExpense() {
+
+    const key = monthKey(currentDate);
+
+    getMonthData(key).expenses.push({
+
+        name: "Nuova spesa",
+
+        icon: "💶",
+
+        amount: 0,
+
+        recurring: false,
+
+        start: key,
+
+        end: key
+
+    });
+
+    saveData();
+
+    render();
+
+}
+
+function calculate() {
+
+    const key = monthKey(currentDate);
+
+    const month = getMonthData(key);
+
+    /*
+       STIPENDI REALI
+    */
+
+    const salaries =
+        Number(month.salaries.me || 0) +
+        Number(month.salaries.husband || 0) +
+        Number(month.salaries.other || 0);
+
+    document.getElementById(
+        "salaryTotal"
+    ).textContent = euro(salaries);
+
+    /*
+       FONDO CASA
+    */
+
+    const houseFund =
+        Number(month.house.me || 0) +
+        Number(month.house.husband || 0);
+
+    document.getElementById(
+        "houseFund"
+    ).textContent = euro(houseFund);
+
+    /*
+       SPESE
+    */
+
+    let expenses = 0;
+
+    month.expenses.forEach(expense => {
+
+        if (!expense.recurring) {
+
+            expenses +=
+                Number(expense.amount || 0);
+
+            return;
+
+        }
+
+        const start =
+            expense.start || key;
+
+        const end =
+            expense.end || key;
+
+        if (
+            key >= start &&
+            key <= end
+        ) {
+
+            expenses +=
+                Number(expense.amount || 0);
+
+        }
+
+    });
+
+    document.getElementById(
+        "totalExpenses"
+    ).textContent = euro(expenses);
+
+    /*
+       AVANZO
+    */
+
+    const balance =
+        houseFund - expenses;
+
+    const balanceElement =
+        document.getElementById(
+            "monthlyBalance"
+        );
+
+    balanceElement.textContent =
+        euro(balance);
+
+    balanceElement.classList.remove(
+        "positive",
+        "negative"
+    );
+
+    if (balance >= 0) {
+
+        balanceElement.classList.add(
+            "positive"
+        );
+
+    } else {
+
+        balanceElement.classList.add(
+            "negative"
+        );
+
+    }
+
+    calculateTotalSaved();
+
+}
+
+function getBalanceForMonth(key) {
+
+    const month = getMonthData(key);
+
+    const houseFund =
+        Number(month.house.me || 0) +
+        Number(month.house.husband || 0);
+
+    let expenses = 0;
+
+    month.expenses.forEach(expense => {
+
+        if (!expense.recurring) {
+
+            expenses +=
+                Number(expense.amount || 0);
+
+            return;
+
+        }
+
+        const start =
+            expense.start || key;
+
+        const end =
+            expense.end || key;
+
+        if (
+            key >= start &&
+            key <= end
+        ) {
+
+            expenses +=
+                Number(expense.amount || 0);
+
+        }
+
+    });
+
+    return houseFund - expenses;
+
+}
+
+function calculateTotalSaved() {
+
+    const currentKey =
+        monthKey(currentDate);
+
+    let total = 0;
+
+    Object.keys(data)
+        .filter(key => key <= currentKey)
+        .sort()
+        .forEach(key => {
+
+            total +=
+                getBalanceForMonth(key);
+
+        });
+
+    document.getElementById(
+        "totalSaved"
+    ).textContent = euro(total);
+
+    updateGoal(total);
+
+}
+
+function updateGoal(total) {
+
+    const goal =
+        Number(
+            document.getElementById(
+                "savingsGoal"
+            ).value
+        ) || 0;
+
+    if (goal <= 0) {
+
+        document.getElementById(
+            "goalBar"
+        ).style.width = "0%";
+
+        document.getElementById(
+            "goalText"
+        ).textContent =
+            "Imposta un obiettivo per vedere i progressi.";
+
+        return;
+
+    }
+
+    const percentage =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                (total / goal) * 100
+            )
+        );
+
+    document.getElementById(
+        "goalBar"
+    ).style.width =
+        percentage + "%";
+
+    const remaining =
+        goal - total;
+
+    if (remaining > 0) {
+
+        document.getElementById(
+            "goalText"
+        ).textContent =
+            "Mancano " +
+            euro(remaining) +
+            " al tuo obiettivo.";
+
+    } else {
+
+        document.getElementById(
+            "goalText"
+        ).textContent =
+            "🎉 Obiettivo raggiunto!";
+
+    }
+
+}
+
+function saveGoal() {
+
+    const goal =
+        Number(
+            document.getElementById(
+                "savingsGoal"
+            ).value
+        ) || 0;
+
+    localStorage.setItem(
+        "budgetCasaGoal",
+        goal
+    );
+
+    calculateTotalSaved();
+
+}
+
+function loadGoal() {
+
+    const goal =
+        Number(
+            localStorage.getItem(
+                "budgetCasaGoal"
+            )
+        ) || 0;
+
+    document.getElementById(
+        "savingsGoal"
+    ).value = goal;
+
+}
+
+function renderHistory() {
+
+    const currentKey =
+        monthKey(currentDate);
+
+    const history =
+        document.getElementById(
+            "history"
+        );
+
+    history.innerHTML = "";
+
+    const keys =
+        Object.keys(data)
+            .filter(key => key <= currentKey)
+            .sort();
+
+    if (keys.length === 0) {
+
+        history.innerHTML =
+            '<div class="small">Nessun dato ancora.</div>';
+
+        return;
+
+    }
+
+    let cumulative = 0;
+
+    keys.forEach(key => {
+
+        const date =
+            new Date(
+                Number(key.substring(0, 4)),
+                Number(key.substring(5, 7)) - 1,
+                1
+            );
+
+        const balance =
+            getBalanceForMonth(key);
+
+        cumulative += balance;
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "history-row";
+
+        const color =
+            balance >= 0
+            ? "#15803d"
+            : "#dc2626";
+
+        const cumulativeColor =
+            cumulative >= 0
+            ? "#15803d"
+            : "#dc2626";
+
+        row.innerHTML = `
+
+            <div>
+
+                <strong>
+                    ${
+                        new Intl.DateTimeFormat(
+                            "it-IT",
+                            {
+                                month: "long",
+                                year: "numeric"
+                            }
+                        ).format(date)
+                    }
+                </strong>
+
+                <div
+                    class="small"
+                    style="color:${color};"
+                >
+                    Avanzo/disavanzo:
+                    ${euro(balance)}
+                </div>
+
+            </div>
+
+            <div
+                style="
+                    font-weight:800;
+                    color:${cumulativeColor};
+                "
+            >
+                ${euro(cumulative)}
+            </div>
+
+        `;
+
+        history.appendChild(row);
+
+    });
+
+}
+
+function copyPreviousMonth() {
+
+    const previousDate =
+        new Date(currentDate);
+
+    previousDate.setMonth(
+        previousDate.getMonth() - 1
+    );
+
+    const previousKey =
+        monthKey(previousDate);
+
+    const currentKey =
+        monthKey(currentDate);
+
+    if (!data[previousKey]) {
+
+        alert(
+            "Non ci sono ancora dati nel mese precedente da copiare."
+        );
+
+        return;
+
+    }
+
+    const previous =
+        getMonthData(previousKey);
+
+    const current =
+        getMonthData(currentKey);
+
+    /*
+       Copia solo le spese,
+       non gli stipendi.
+    */
+
+    current.expenses =
+        JSON.parse(
+            JSON.stringify(
+                previous.expenses
+            )
+        );
+
+    /*
+       Aggiorniamo le date delle spese
+       non ricorrenti al nuovo mese.
+    */
+
+    current.expenses.forEach(expense => {
+
+        if (!expense.recurring) {
+
+            expense.start =
+                currentKey;
+
+            expense.end =
+                currentKey;
+
+        }
+
+    });
+
+    saveData();
+
+    render();
+
+}
+
+function changeMonth(amount) {
+
+    currentDate.setMonth(
+        currentDate.getMonth() + amount
+    );
+
+    render();
+
+}
+
+function resetCurrentMonth() {
+
+    const key =
+        monthKey(currentDate);
+
+    const confirmation =
+        confirm(
+            "Vuoi davvero cancellare tutti i dati di " +
+            formatMonth(currentDate) +
+            "?"
+        );
+
+    if (!confirmation) {
+        return;
+    }
+
+    delete data[key];
+
+    saveData();
+
+    render();
+
+}
+
+function escapeHtml(text) {
+
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+/*
+   AVVIO
+*/
+
+loadGoal();
+
+render();
+
+</script>
+
+</body>
+</html>
