@@ -201,8 +201,12 @@ button.danger{
     line-height:1.5;
 }
 
-.hidden{
-    display:none;
+.extra{
+    border-color:#4a405c;
+}
+
+.extra label{
+    color:#d1b8ff;
 }
 
 @media(max-width:650px){
@@ -237,6 +241,7 @@ button.danger{
     </div>
 
 </div>
+
 
 <div class="card">
 
@@ -375,8 +380,8 @@ Le bollette vengono sottratte solo nel mese in cui vengono effettivamente pagate
 </div>
 
 <div class="small" style="margin-top:10px">
-Gli imprevisti servono per spese occasionali, ad esempio la bolletta vecchia di ottobre,
-una revisione dell'auto o altre spese non ricorrenti.
+Gli imprevisti servono per spese occasionali, ad esempio una revisione dell'auto
+o una bolletta vecchia.
 </div>
 
 </div>
@@ -388,9 +393,11 @@ una revisione dell'auto o altre spese non ricorrenti.
 
 <div class="small">
 Imposta una volta il debito totale, la rata mensile e il mese della prima rata.
-L'app calcolerà automaticamente le rate successive e l'ultima rata.
+Il pagamento extra può essere modificato liberamente ogni mese.
 </div>
 
+
+<!-- FINANZIAMENTO PROPRIETARIO -->
 
 <div class="debt">
 
@@ -413,12 +420,19 @@ L'app calcolerà automaticamente le rate successive e l'ultima rata.
         <input type="month" id="ownerStart">
     </div>
 
+    <div class="field extra">
+        <label>Pagamento extra sul debito — questo mese</label>
+        <input type="number" step="0.01" id="ownerExtra">
+    </div>
+
 </div>
 
 <div id="ownerInfo" class="notice"></div>
 
 </div>
 
+
+<!-- ARRETRATO AFFITTO -->
 
 <div class="debt">
 
@@ -441,12 +455,19 @@ L'app calcolerà automaticamente le rate successive e l'ultima rata.
         <input type="month" id="rentStart">
     </div>
 
+    <div class="field extra">
+        <label>Pagamento extra sul debito — questo mese</label>
+        <input type="number" step="0.01" id="rentExtra">
+    </div>
+
 </div>
 
 <div id="rentDebtInfo" class="notice"></div>
 
 </div>
 
+
+<!-- RISCALDAMENTO -->
 
 <div class="debt">
 
@@ -467,6 +488,11 @@ L'app calcolerà automaticamente le rate successive e l'ultima rata.
     <div class="field">
         <label>Prima rata</label>
         <input type="month" id="heatingStart">
+    </div>
+
+    <div class="field extra">
+        <label>Pagamento extra sul debito — questo mese</label>
+        <input type="number" step="0.01" id="heatingExtra">
     </div>
 
 </div>
@@ -550,10 +576,10 @@ L'app calcolerà automaticamente le rate successive e l'ultima rata.
 
 <script>
 
-const STORAGE_KEY = "budgetCasaV9";
+const STORAGE_KEY = "budgetCasaV10";
 
 const START_YEAR = 2026;
-const START_MONTH = 9; // ottobre = 9
+const START_MONTH = 9;
 
 const months = [
     "Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
@@ -604,30 +630,34 @@ function loadData(){
 
     try{
 
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved=localStorage.getItem(STORAGE_KEY);
 
         if(saved){
 
-            const parsed = JSON.parse(saved);
+            const parsed=JSON.parse(saved);
 
-            const base = defaultData();
+            const base=defaultData();
 
-            return {
+            const loaded={
                 ...base,
                 ...parsed,
                 settings:{
                     ...base.settings,
-                    ...(parsed.settings || {}),
+                    ...(parsed.settings||{}),
+
                     debts:{
                         ...base.settings.debts,
-                        ...((parsed.settings || {}).debts || {})
+                        ...((parsed.settings||{}).debts||{})
                     },
+
                     utilities:{
                         ...base.settings.utilities,
-                        ...((parsed.settings || {}).utilities || {})
+                        ...((parsed.settings||{}).utilities||{})
                     }
                 }
             };
+
+            return loaded;
         }
 
     }catch(e){}
@@ -638,7 +668,12 @@ function loadData(){
 
 function saveData(){
 
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+    getMonthValues();
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
 
     update();
 }
@@ -674,9 +709,23 @@ function getMonthData(key){
             carInsurance:118,
             soris:0,
 
-            unexpected:0
+            unexpected:0,
+
+            ownerExtra:0,
+            rentExtra:0,
+            heatingExtra:0
         };
     }
+
+    // Compatibilità con i dati precedenti V9
+    if(data.months[key].ownerExtra===undefined)
+        data.months[key].ownerExtra=0;
+
+    if(data.months[key].rentExtra===undefined)
+        data.months[key].rentExtra=0;
+
+    if(data.months[key].heatingExtra===undefined)
+        data.months[key].heatingExtra=0;
 
     return data.months[key];
 }
@@ -711,7 +760,12 @@ function monthsDifference(startKey,currentKey){
 }
 
 
-function getDebtPayment(debt,currentKey){
+/*
+    Calcola quanto resta da pagare PRIMA della rata del mese,
+    tenendo conto di tutti gli extra già inseriti nei mesi precedenti.
+*/
+
+function getDebtRemainingBeforePayment(debt,type,currentKey){
 
     if(!debt) return 0;
 
@@ -719,61 +773,217 @@ function getDebtPayment(debt,currentKey){
     const installment=Number(debt.installment)||0;
     const start=debt.start;
 
-    if(total<=0 || installment<=0 || !start) return 0;
+    if(total<=0 || installment<=0 || !start)
+        return 0;
 
     const diff=monthsDifference(start,currentKey);
 
-    if(diff<0) return 0;
+    if(diff<0)
+        return total;
 
-    const alreadyPaid=diff*installment;
+    let remaining=total;
 
-    if(alreadyPaid>=total) return 0;
+    const startDate=getMonthDate(start);
+
+    for(let i=0;i<diff;i++){
+
+        const date=new Date(startDate);
+
+        date.setMonth(date.getMonth()+i);
+
+        const key=monthKey(date);
+
+        const normal=Math.min(
+            installment,
+            remaining
+        );
+
+        const month=getMonthData(key);
+
+        let extra=0;
+
+        if(type==="owner")
+            extra=Number(month.ownerExtra)||0;
+
+        if(type==="rent")
+            extra=Number(month.rentExtra)||0;
+
+        if(type==="heating")
+            extra=Number(month.heatingExtra)||0;
+
+        const payment=Math.min(
+            remaining,
+            normal+Math.max(0,extra)
+        );
+
+        remaining-=payment;
+
+        if(remaining<=0)
+            return 0;
+    }
+
+    return Math.max(0,remaining);
+}
+
+
+function getDebtPayment(debt,type,currentKey){
+
+    const before=getDebtRemainingBeforePayment(
+        debt,
+        type,
+        currentKey
+    );
+
+    if(before<=0)
+        return 0;
+
+    const installment=Number(debt.installment)||0;
+
+    const month=getMonthData(currentKey);
+
+    let extra=0;
+
+    if(type==="owner")
+        extra=Number(month.ownerExtra)||0;
+
+    if(type==="rent")
+        extra=Number(month.rentExtra)||0;
+
+    if(type==="heating")
+        extra=Number(month.heatingExtra)||0;
 
     return Math.min(
-        installment,
-        total-alreadyPaid
+        before,
+        installment+Math.max(0,extra)
     );
 }
 
 
-function getDebtRemaining(debt,currentKey){
-
-    if(!debt) return 0;
+function getDebtLastPaymentDate(debt,type){
 
     const total=Number(debt.total)||0;
     const installment=Number(debt.installment)||0;
     const start=debt.start;
 
-    if(total<=0 || installment<=0 || !start) return 0;
+    if(total<=0 || installment<=0 || !start)
+        return null;
 
-    const diff=monthsDifference(start,currentKey);
+    let remaining=total;
 
-    if(diff<0) return total;
+    const startDate=getMonthDate(start);
 
-    const paidBefore=Math.min(
-        total,
-        diff*installment
-    );
+    /*
+       Simuliamo mese per mese.
+       In questo modo gli extra modificano davvero
+       la data dell'ultima rata.
+    */
 
-    return Math.max(0,total-paidBefore);
+    for(let i=0;i<600;i++){
+
+        const date=new Date(startDate);
+
+        date.setMonth(date.getMonth()+i);
+
+        const key=monthKey(date);
+
+        const month=getMonthData(key);
+
+        let extra=0;
+
+        if(type==="owner")
+            extra=Number(month.ownerExtra)||0;
+
+        if(type==="rent")
+            extra=Number(month.rentExtra)||0;
+
+        if(type==="heating")
+            extra=Number(month.heatingExtra)||0;
+
+        const payment=Math.min(
+            remaining,
+            installment+Math.max(0,extra)
+        );
+
+        remaining-=payment;
+
+        if(remaining<=0)
+            return key;
+    }
+
+    return null;
 }
 
 
-function getDebtLastPaymentDate(debt){
+function debtInfo(debt,type,currentKey){
+
+    const before=getDebtRemainingBeforePayment(
+        debt,
+        type,
+        currentKey
+    );
+
+    const payment=getDebtPayment(
+        debt,
+        type,
+        currentKey
+    );
 
     const total=Number(debt.total)||0;
-    const installment=Number(debt.installment)||0;
-    const start=debt.start;
 
-    if(total<=0 || installment<=0 || !start) return null;
+    const remainingAfter=Math.max(
+        0,
+        before-payment
+    );
 
-    const payments=Math.ceil(total/installment);
+    const paid=Math.max(
+        0,
+        total-remainingAfter
+    );
 
-    const date=getMonthDate(start);
+    const percent=total>0
+        ? Math.min(100,(paid/total)*100)
+        : 0;
 
-    date.setMonth(date.getMonth()+payments-1);
+    const last=getDebtLastPaymentDate(
+        debt,
+        type
+    );
 
-    return monthKey(date);
+    return `
+        <div>
+            <strong>Pagamento totale questo mese:</strong>
+            ${money(payment)}
+        </div>
+
+        <div class="small" style="margin-top:4px">
+            Rata prevista: ${money(Number(debt.installment)||0)}
+            &nbsp; + &nbsp;
+            Extra: ${money(
+                type==="owner"
+                    ? getMonthData(currentKey).ownerExtra
+                    : type==="rent"
+                        ? getMonthData(currentKey).rentExtra
+                        : getMonthData(currentKey).heatingExtra
+            )}
+        </div>
+
+        <div style="margin-top:8px">
+            <strong>Debito residuo dopo questo mese:</strong>
+            ${money(remainingAfter)}
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar"
+                 style="width:${percent}%"></div>
+        </div>
+
+        <div class="small">
+            Pagato: ${money(paid)} su ${money(total)}
+            <br>
+            Ultima rata prevista:
+            ${last ? formatMonthKey(last) : "—"}
+        </div>
+    `;
 }
 
 
@@ -787,54 +997,20 @@ function formatMonthKey(key){
 }
 
 
-function debtInfo(debt,currentKey){
-
-    const payment=getDebtPayment(debt,currentKey);
-    const remaining=getDebtRemaining(debt,currentKey);
-
-    const total=Number(debt.total)||0;
-
-    const paid=Math.max(0,total-remaining);
-
-    const percent=total>0
-        ? Math.min(100,(paid/total)*100)
-        : 0;
-
-    const last=getDebtLastPaymentDate(debt);
-
-    return `
-        <div>
-            <strong>Rata questo mese:</strong> ${money(payment)}
-        </div>
-
-        <div>
-            <strong>Debito residuo:</strong> ${money(remaining)}
-        </div>
-
-        <div class="progress">
-            <div class="progress-bar" style="width:${percent}%"></div>
-        </div>
-
-        <div class="small">
-            Pagato: ${money(paid)} su ${money(total)}
-            <br>
-            Ultima rata prevista: ${last ? formatMonthKey(last) : "—"}
-        </div>
-    `;
-}
-
-
 function setValue(id,value){
 
     const el=document.getElementById(id);
 
-    if(el) el.value=value ?? 0;
+    if(el)
+        el.value=value ?? 0;
 }
 
 
 function getNumber(id){
 
-    return Number(document.getElementById(id).value)||0;
+    return Number(
+        document.getElementById(id).value
+    )||0;
 }
 
 
@@ -865,20 +1041,44 @@ function getMonthValues(){
 
     m.unexpected=getNumber("unexpected");
 
-    data.settings.utilities.lightProvision=getNumber("lightProvision");
-    data.settings.utilities.gasProvision=getNumber("gasProvision");
+    m.ownerExtra=getNumber("ownerExtra");
+    m.rentExtra=getNumber("rentExtra");
+    m.heatingExtra=getNumber("heatingExtra");
 
-    data.settings.debts.owner.total=getNumber("ownerDebt");
-    data.settings.debts.owner.installment=getNumber("ownerInstallment");
-    data.settings.debts.owner.start=document.getElementById("ownerStart").value;
+    data.settings.utilities.lightProvision=
+        getNumber("lightProvision");
 
-    data.settings.debts.rent.total=getNumber("rentDebt");
-    data.settings.debts.rent.installment=getNumber("rentInstallment");
-    data.settings.debts.rent.start=document.getElementById("rentStart").value;
+    data.settings.utilities.gasProvision=
+        getNumber("gasProvision");
 
-    data.settings.debts.heating.total=getNumber("heatingDebt");
-    data.settings.debts.heating.installment=getNumber("heatingInstallment");
-    data.settings.debts.heating.start=document.getElementById("heatingStart").value;
+    data.settings.debts.owner.total=
+        getNumber("ownerDebt");
+
+    data.settings.debts.owner.installment=
+        getNumber("ownerInstallment");
+
+    data.settings.debts.owner.start=
+        document.getElementById("ownerStart").value;
+
+
+    data.settings.debts.rent.total=
+        getNumber("rentDebt");
+
+    data.settings.debts.rent.installment=
+        getNumber("rentInstallment");
+
+    data.settings.debts.rent.start=
+        document.getElementById("rentStart").value;
+
+
+    data.settings.debts.heating.total=
+        getNumber("heatingDebt");
+
+    data.settings.debts.heating.installment=
+        getNumber("heatingInstallment");
+
+    data.settings.debts.heating.start=
+        document.getElementById("heatingStart").value;
 }
 
 
@@ -888,7 +1088,7 @@ function loadMonth(){
 
     const m=getMonthData(key);
 
-    document.getElementById("monthTitle").textContent =
+    document.getElementById("monthTitle").textContent=
         months[currentDate.getMonth()]+" "+currentDate.getFullYear();
 
     setValue("salary1",m.salary1);
@@ -912,6 +1112,10 @@ function loadMonth(){
 
     setValue("unexpected",m.unexpected);
 
+    setValue("ownerExtra",m.ownerExtra);
+    setValue("rentExtra",m.rentExtra);
+    setValue("heatingExtra",m.heatingExtra);
+
     setValue(
         "lightProvision",
         data.settings.utilities.lightProvision
@@ -922,19 +1126,29 @@ function loadMonth(){
         data.settings.utilities.gasProvision
     );
 
+
     const debts=data.settings.debts;
 
     setValue("ownerDebt",debts.owner.total);
     setValue("ownerInstallment",debts.owner.installment);
-    document.getElementById("ownerStart").value=debts.owner.start || "";
+
+    document.getElementById("ownerStart").value=
+        debts.owner.start || "";
+
 
     setValue("rentDebt",debts.rent.total);
     setValue("rentInstallment",debts.rent.installment);
-    document.getElementById("rentStart").value=debts.rent.start || "";
+
+    document.getElementById("rentStart").value=
+        debts.rent.start || "";
+
 
     setValue("heatingDebt",debts.heating.total);
     setValue("heatingInstallment",debts.heating.installment);
-    document.getElementById("heatingStart").value=debts.heating.start || "";
+
+    document.getElementById("heatingStart").value=
+        debts.heating.start || "";
+
 
     update();
 }
@@ -944,7 +1158,14 @@ function changeMonth(amount){
 
     getMonthValues();
 
-    currentDate.setMonth(currentDate.getMonth()+amount);
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
+
+    currentDate.setMonth(
+        currentDate.getMonth()+amount
+    );
 
     loadMonth();
 }
@@ -956,7 +1177,9 @@ function copyPreviousExpenses(){
 
     const previous=new Date(currentDate);
 
-    previous.setMonth(previous.getMonth()-1);
+    previous.setMonth(
+        previous.getMonth()-1
+    );
 
     const previousKey=monthKey(previous);
 
@@ -964,12 +1187,16 @@ function copyPreviousExpenses(){
 
     if(!previousData){
 
-        alert("Non ci sono dati del mese precedente da copiare.");
+        alert(
+            "Non ci sono dati del mese precedente da copiare."
+        );
 
         return;
     }
 
-    const current=getMonthData(monthKey(currentDate));
+    const current=getMonthData(
+        monthKey(currentDate)
+    );
 
     current.internet=previousData.internet;
     current.netflix=previousData.netflix;
@@ -977,6 +1204,11 @@ function copyPreviousExpenses(){
     current.carInsurance=previousData.carInsurance;
     current.soris=previousData.soris;
     current.unexpected=previousData.unexpected;
+
+    /*
+       Gli extra sui debiti NON vengono copiati.
+       Ogni mese partono da 0.
+    */
 
     loadMonth();
 
@@ -992,22 +1224,40 @@ function calculateMonth(key,utilityOpening){
         (Number(m.contribution1)||0)+
         (Number(m.contribution2)||0);
 
+
     const utilityProvision=
         (Number(data.settings.utilities.lightProvision)||0)+
         (Number(data.settings.utilities.gasProvision)||0);
+
 
     const utilityPaid=
         (Number(m.lightPaid)||0)+
         (Number(m.gasPaid)||0);
 
+
     const ownerPayment=
-        getDebtPayment(data.settings.debts.owner,key);
+        getDebtPayment(
+            data.settings.debts.owner,
+            "owner",
+            key
+        );
+
 
     const rentDebtPayment=
-        getDebtPayment(data.settings.debts.rent,key);
+        getDebtPayment(
+            data.settings.debts.rent,
+            "rent",
+            key
+        );
+
 
     const heatingPayment=
-        getDebtPayment(data.settings.debts.heating,key);
+        getDebtPayment(
+            data.settings.debts.heating,
+            "heating",
+            key
+        );
+
 
     const nonUtilityExpenses=
 
@@ -1029,18 +1279,22 @@ function calculateMonth(key,utilityOpening){
         rentDebtPayment+
         heatingPayment;
 
+
     let generalMonthly=
         contributions-
         utilityProvision-
         nonUtilityExpenses+
         (Number(m.interest)||0);
 
+
     let utilityFund=
         utilityOpening+
         utilityProvision-
         utilityPaid;
 
+
     let coveredFromGeneral=0;
+
 
     if(utilityFund<0){
 
@@ -1051,7 +1305,9 @@ function calculateMonth(key,utilityOpening){
         utilityFund=0;
     }
 
+
     return {
+
         salaries:
             (Number(m.salary1)||0)+
             (Number(m.salary2)||0),
@@ -1059,6 +1315,7 @@ function calculateMonth(key,utilityOpening){
         contributions,
 
         utilityProvision,
+
         utilityPaid,
 
         nonUtilityExpenses,
@@ -1067,11 +1324,7 @@ function calculateMonth(key,utilityOpening){
 
         utilityFund,
 
-        coveredFromGeneral,
-
-        totalMonthly:
-            generalMonthly+
-            (utilityFund-utilityOpening)
+        coveredFromGeneral
     };
 }
 
@@ -1084,21 +1337,30 @@ function getCumulativeUntil(currentKey){
     const keys=Object.keys(data.months)
         .concat([currentKey]);
 
-    const unique=[...new Set(keys)]
-        .sort();
+    const unique=[
+        ...new Set(keys)
+    ].sort();
+
 
     for(const key of unique){
 
-        if(key<"2026-10") continue;
+        if(key<"2026-10")
+            continue;
 
-        if(key>currentKey) continue;
+        if(key>currentKey)
+            continue;
 
-        const result=calculateMonth(key,utility);
+        const result=
+            calculateMonth(
+                key,
+                utility
+            );
 
         general+=result.generalMonthly;
 
         utility=result.utilityFund;
     }
+
 
     return {
         general,
@@ -1114,76 +1376,138 @@ function update(){
 
     const key=monthKey(currentDate);
 
-    const m=getMonthData(key);
+    const cumulative=
+        getCumulativeUntil(key);
 
-    const cumulative=getCumulativeUntil(key);
 
     let utilityOpening=0;
 
     const previous=new Date(currentDate);
 
-    previous.setMonth(previous.getMonth()-1);
+    previous.setMonth(
+        previous.getMonth()-1
+    );
 
-    const previousKey=monthKey(previous);
+    const previousKey=
+        monthKey(previous);
+
 
     if(previousKey>="2026-10"){
 
-        const previousCum=getCumulativeUntil(previousKey);
+        const previousCum=
+            getCumulativeUntil(previousKey);
 
-        utilityOpening=previousCum.utility;
+        utilityOpening=
+            previousCum.utility;
     }
 
-    const result=calculateMonth(
-        key,
-        utilityOpening
-    );
 
-    document.getElementById("totalSalaries").textContent=
+    const result=
+        calculateMonth(
+            key,
+            utilityOpening
+        );
+
+
+    document.getElementById(
+        "totalSalaries"
+    ).textContent=
         money(result.salaries);
 
-    document.getElementById("houseFund").textContent=
+
+    document.getElementById(
+        "houseFund"
+    ).textContent=
         money(result.contributions);
 
-    document.getElementById("nonUtilityExpenses").textContent=
+
+    document.getElementById(
+        "nonUtilityExpenses"
+    ).textContent=
         money(result.nonUtilityExpenses);
 
-    document.getElementById("utilityProvision").textContent=
+
+    document.getElementById(
+        "utilityProvision"
+    ).textContent=
         money(result.utilityProvision);
 
-    document.getElementById("utilityPaid").textContent=
+
+    document.getElementById(
+        "utilityPaid"
+    ).textContent=
         money(result.utilityPaid);
 
-    const monthlyEl=document.getElementById("monthlyResult");
+
+    const monthlyEl=
+        document.getElementById(
+            "monthlyResult"
+        );
+
 
     monthlyEl.textContent=
         money(result.generalMonthly);
 
+
     monthlyEl.className=
         "value "+
-        (result.generalMonthly>=0 ? "positive":"negative");
+        (
+            result.generalMonthly>=0
+            ? "positive"
+            : "negative"
+        );
 
-    document.getElementById("generalCumulative").textContent=
+
+    document.getElementById(
+        "generalCumulative"
+    ).textContent=
         money(cumulative.general);
 
-    document.getElementById("utilityCumulative").textContent=
+
+    document.getElementById(
+        "utilityCumulative"
+    ).textContent=
         money(cumulative.utility);
 
-    document.getElementById("totalSaved").textContent=
+
+    document.getElementById(
+        "totalSaved"
+    ).textContent=
         money(cumulative.total);
 
-    const notice=document.getElementById("utilityNotice");
+
+    const notice=
+        document.getElementById(
+            "utilityNotice"
+        );
+
 
     if(result.coveredFromGeneral<0){
 
         notice.innerHTML=`
+
             <div class="notice">
-                ⚠️ Il salvadanaio Luce + Gas non era sufficiente.
+
+                ⚠️ Il salvadanaio Luce + Gas
+                non era sufficiente.
+
                 <br>
+
                 Sono stati coperti
-                <strong>${money(Math.abs(result.coveredFromGeneral))}</strong>
+                <strong>
+                    ${money(
+                        Math.abs(
+                            result.coveredFromGeneral
+                        )
+                    )}
+                </strong>
                 dall'accantonamento generale.
+
                 <br>
-                Il salvadanaio Luce + Gas è tornato a €0.
+
+                Il salvadanaio Luce + Gas
+                è tornato a €0.
+
             </div>
         `;
 
@@ -1192,21 +1516,33 @@ function update(){
         notice.innerHTML="";
     }
 
-    document.getElementById("ownerInfo").innerHTML=
+
+    document.getElementById(
+        "ownerInfo"
+    ).innerHTML=
         debtInfo(
             data.settings.debts.owner,
+            "owner",
             key
         );
 
-    document.getElementById("rentDebtInfo").innerHTML=
+
+    document.getElementById(
+        "rentDebtInfo"
+    ).innerHTML=
         debtInfo(
             data.settings.debts.rent,
+            "rent",
             key
         );
 
-    document.getElementById("heatingInfo").innerHTML=
+
+    document.getElementById(
+        "heatingInfo"
+    ).innerHTML=
         debtInfo(
             data.settings.debts.heating,
+            "heating",
             key
         );
 }
@@ -1214,13 +1550,16 @@ function update(){
 
 function resetCurrentMonth(){
 
-    if(!confirm("Vuoi davvero azzerare i dati di questo mese?")) {
+    if(!confirm(
+        "Vuoi davvero azzerare i dati di questo mese?"
+    ))
         return;
-    }
+
 
     const key=monthKey(currentDate);
 
     data.months[key]={
+
         salary1:0,
         salary2:0,
 
@@ -1240,8 +1579,13 @@ function resetCurrentMonth(){
         carInsurance:118,
         soris:0,
 
-        unexpected:0
+        unexpected:0,
+
+        ownerExtra:0,
+        rentExtra:0,
+        heatingExtra:0
     };
+
 
     loadMonth();
 
@@ -1249,20 +1593,25 @@ function resetCurrentMonth(){
 }
 
 
-document.querySelectorAll("input").forEach(input=>{
+document.querySelectorAll("input").forEach(
+    input=>{
 
-    input.addEventListener("input",()=>{
+        input.addEventListener(
+            "input",
+            ()=>{
 
-        getMonthValues();
-        update();
+                getMonthValues();
 
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(data)
+                update();
+
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(data)
+                );
+            }
         );
-    });
-
-});
+    }
+);
 
 
 loadMonth();
